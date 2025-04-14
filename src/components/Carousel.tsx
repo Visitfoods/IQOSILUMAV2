@@ -59,6 +59,7 @@ export default function Carousel() {
   const [showModel3D, setShowModel3D] = useState(false);
   const [activePopup, setActivePopup] = useState<string | null>(null);
   const [activeIconRef, setActiveIconRef] = useState<HTMLDivElement | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
   const iconRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const pathname = usePathname();
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -316,6 +317,35 @@ export default function Carousel() {
     // Não renderizar nada se não houver popup ativo
     if (!activePopup || !activeIconRef) return null;
     
+    // Definir todos os ícones disponíveis para o carrossel
+    const availableIcons = selectedMachine?.baseModel === "ILUMAi-ONE" 
+      ? ["FlexPuffONE", "InicioAutomatico"] 
+      : ["FlexPuff", "FlexBattery", "ModoPausa", "EcraTatil"];
+    
+    // Encontrar índice do ícone ativo no array de ícones disponíveis
+    const activeIconIndex = availableIcons.findIndex(icon => icon === activePopup);
+    
+    // Função para navegar para o próximo ícone no carrossel
+    const navigateToNextIcon = (direction: "left" | "right") => {
+      const totalIcons = availableIcons.length;
+      let newIndex;
+      
+      if (direction === "left") {
+        newIndex = (activeIconIndex - 1 + totalIcons) % totalIcons;
+      } else {
+        newIndex = (activeIconIndex + 1) % totalIcons;
+      }
+      
+      setSwipeDirection(direction);
+      
+      // Delay para dar tempo à animação
+      setTimeout(() => {
+        setActivePopup(availableIcons[newIndex]);
+        setActiveIconRef(iconRefs.current[availableIcons[newIndex]]);
+        setSwipeDirection(null);
+      }, 300);
+    };
+    
     // Determinar conteúdo do popup com base no ícone ativo
     let title = '';
     let content: React.ReactNode = null;
@@ -363,6 +393,25 @@ export default function Carousel() {
       default:
         return null;
     }
+    
+    // Obter todos os caminhos dos ícones para o carrossel
+    const getIconInfo = (iconName: string) => {
+      switch (iconName) {
+        case "FlexPuff":
+        case "FlexPuffONE":
+          return { src: "/IQOSILUMAV2/Icons/FlexPuff.svg", label: "Flex Puff" };
+        case "FlexBattery":
+          return { src: "/IQOSILUMAV2/Icons/FlexBattery.svg", label: "Flex Battery" };
+        case "ModoPausa":
+          return { src: "/IQOSILUMAV2/Icons/Modo Pausa.svg", label: "Modo Pausa" };
+        case "EcraTatil":
+          return { src: "/IQOSILUMAV2/Icons/EcraTatil.svg", label: "Ecrã Tátil" };
+        case "InicioAutomatico":
+          return { src: "/IQOSILUMAV2/Icons/InicioAutomatico.svg", label: "Início Automático" };
+        default:
+          return { src: "", label: "" };
+      }
+    };
     
     return (
       <>
@@ -462,6 +511,19 @@ export default function Carousel() {
               }
             }}
             onClick={(e) => e.stopPropagation()}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, { offset, velocity }) => {
+              const swipe = offset.x;
+              if (Math.abs(swipe) > 50) {
+                if (swipe < 0) {
+                  navigateToNextIcon("right");
+                } else {
+                  navigateToNextIcon("left");
+                }
+              }
+            }}
           >
             {/* Contorno futurista estático */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
@@ -506,12 +568,12 @@ export default function Carousel() {
               initial={{ y: 10 }}
               animate={{ 
                 y: 0,
-                x: [0, -3, 0, 3, 0],
+                x: swipeDirection === "left" ? [0, 300] : swipeDirection === "right" ? [0, -300] : [0, -3, 0, 3, 0],
               }}
               transition={{ 
                 delay: 0.1, 
-                duration: 0.4,
-                x: {
+                duration: swipeDirection ? 0.3 : 0.4,
+                x: swipeDirection ? { duration: 0.3 } : {
                   duration: 15,
                   repeat: Infinity,
                   ease: "easeInOut"
@@ -537,6 +599,72 @@ export default function Carousel() {
             {/* Grafismo futurista */}
             <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#5CD9E8]/30 rounded-tr-3xl" />
             <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#5CD9E8]/30 rounded-bl-3xl" />
+            
+            {/* Setas para navegar entre popups */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-0 p-2">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateToNextIcon("left");
+                }}
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white/70 hover:text-white/100 transition-colors transform hover:scale-110"
+                aria-label="Popup anterior"
+              >
+                <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+              </button>
+            </div>
+            
+            <div className="absolute top-1/2 -translate-y-1/2 right-0 p-2">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateToNextIcon("right");
+                }}
+                className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white/70 hover:text-white/100 transition-colors transform hover:scale-110"
+                aria-label="Próximo popup"
+              >
+                <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+              </button>
+            </div>
+            
+            {/* Carrossel de ícones abaixo do popup */}
+            <div className="absolute bottom-0 left-0 right-0 -mb-16 flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
+              {availableIcons.map((iconName, index) => {
+                const isActive = iconName === activePopup;
+                const { src, label } = getIconInfo(iconName);
+                return (
+                  <motion.button
+                    key={iconName}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePopup(iconName);
+                      setActiveIconRef(iconRefs.current[iconName]);
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`flex flex-col items-center ${isActive ? 'scale-110' : 'opacity-70'}`}
+                  >
+                    <div className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full ${isActive ? 'bg-[#1A6A72] ring-2 ring-[#5CD9E8]' : 'bg-[#1A6A72]/50'} backdrop-blur-md p-1`}>
+                      <Image
+                        src={src}
+                        alt={label}
+                        width={24}
+                        height={24}
+                        className="w-5 h-5 sm:w-6 sm:h-6 brightness-0 invert"
+                      />
+                    </div>
+                    <span className={`text-[10px] sm:text-xs text-white mt-1 ${isActive ? 'font-bold' : 'font-normal opacity-70'}`}>
+                      {label}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+            
+            {/* Dica de swipe */}
+            <div className="absolute bottom-2 left-0 right-0 text-center">
+              <span className="text-xs text-white/60">← Deslize para navegar →</span>
+            </div>
           </motion.div>
         </motion.div>
       </>
