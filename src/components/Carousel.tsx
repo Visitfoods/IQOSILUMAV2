@@ -537,10 +537,10 @@ export default function Carousel() {
                           
                           // Criar efeito de arco usando uma função quadrática
                           const xSpacing = 60; // Espaçamento horizontal entre as bolas
-                          const maxYOffset = -30; // Altura máxima do arco
+                          const maxYOffset = 30; // Altura máxima do arco (agora positivo para curvar para baixo)
                           
-                          // Função quadrática para criar o arco
-                          const yOffset = maxYOffset * (1 - Math.pow(offset / centerIndex, 2));
+                          // Função quadrática para criar o arco em U
+                          const yOffset = maxYOffset * Math.pow(offset / centerIndex, 2);
                           
                           return (
                             <button
