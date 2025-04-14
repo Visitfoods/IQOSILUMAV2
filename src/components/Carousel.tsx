@@ -415,11 +415,13 @@ export default function Carousel() {
                     {formatModelName(selectedMachine?.baseModel || "")}
                   </h1>
 
-                  {/* Ícones logo após o título */}
-                  <div className="flex justify-center items-start gap-8 sm:gap-12 md:gap-16 mb-6 sm:mb-8 md:mb-10 mt-12 sm:mt-6 md:mt-8">
+                  {/* Container principal com posicionamento relativo para os ícones */}
+                  <div className="relative w-full flex-1 flex items-center justify-center">
+                    {/* Ícones */}
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
-                        <div className="flex flex-col items-center">
+                        {/* Ícone esquerdo para ILUMAi ONE */}
+                        <div className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
@@ -430,7 +432,8 @@ export default function Carousel() {
                           <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
                         </div>
 
-                        <div className="flex flex-col items-center">
+                        {/* Ícone direito para ILUMAi ONE */}
+                        <div className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
@@ -443,85 +446,92 @@ export default function Carousel() {
                       </>
                     ) : (
                       <>
-                        <div className="flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
-                            alt="Flex Puff"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                        {/* Grupo de ícones à esquerda para ILUMAi e ILUMAi PRIME */}
+                        <div className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center space-y-8 sm:space-y-12">
+                          <div className="flex flex-col items-center">
+                            <Image
+                              src="/IQOSILUMAV2/Icons/FlexPuff.svg"
+                              alt="Flex Puff"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                          </div>
+
+                          <div className="flex flex-col items-center">
+                            <Image
+                              src="/IQOSILUMAV2/Icons/FlexBattery.svg"
+                              alt="Flex Battery"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
+                          </div>
                         </div>
 
-                        <div className="flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/FlexBattery.svg"
-                            alt="Flex Battery"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
-                        </div>
+                        {/* Grupo de ícones à direita para ILUMAi e ILUMAi PRIME */}
+                        <div className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center space-y-8 sm:space-y-12">
+                          <div className="flex flex-col items-center">
+                            <Image
+                              src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
+                              alt="Modo Pausa"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
+                          </div>
 
-                        <div className="flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
-                            alt="Modo Pausa"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
-                        </div>
-
-                        <div className="flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/EcraTatil.svg"
-                            alt="Ecrã Tátil"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
+                          <div className="flex flex-col items-center">
+                            <Image
+                              src="/IQOSILUMAV2/Icons/EcraTatil.svg"
+                              alt="Ecrã Tátil"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
+                          </div>
                         </div>
                       </>
                     )}
-                  </div>
 
-                  <div className="relative w-full flex-1 flex items-center justify-center -mt-65 sm:-mt-70 md:-mt-80">
-                    {/* Botão "Ver em 3D" */}
-                    {selectedMachine?.modelPath && (
-                      <button
-                        onClick={toggleModelView}
-                        className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
-                        aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
-                      >
-                        <CubeIcon className="w-5 h-5" />
-                        <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
-                      </button>
-                    )}
-                    
-                    {showModel3D && selectedMachine?.modelPath ? (
-                      <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
-                        <ModelViewer3D 
-                          modelPath={getModelPath(selectedMachine) || ""}
-                          scale={7}
-                          position={[0, 0, 0]}
-                          autoRotate={true}
+                    {/* Imagem central do dispositivo */}
+                    <div className="relative w-full flex-1 flex items-center justify-center -mt-65 sm:-mt-70 md:-mt-80">
+                      {/* Botão "Ver em 3D" */}
+                      {selectedMachine?.modelPath && (
+                        <button
+                          onClick={toggleModelView}
+                          className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
+                          aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
+                        >
+                          <CubeIcon className="w-5 h-5" />
+                          <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
+                        </button>
+                      )}
+                      
+                      {showModel3D && selectedMachine?.modelPath ? (
+                        <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                          <ModelViewer3D 
+                            modelPath={getModelPath(selectedMachine) || ""}
+                            scale={7}
+                            position={[0, 0, 0]}
+                            autoRotate={true}
+                          />
+                        </div>
+                      ) : (
+                        <Image
+                          src={getImagePath(selectedMachine!, selectedColor)}
+                          alt={selectedMachine?.name || ""}
+                          width={400}
+                          height={400}
+                          className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                          priority
                         />
-                      </div>
-                    ) : (
-                      <Image
-                        src={getImagePath(selectedMachine!, selectedColor)}
-                        alt={selectedMachine?.name || ""}
-                        width={400}
-                        height={400}
-                        className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
-                        priority
-                      />
-                    )}
+                      )}
+                    </div>
                   </div>
 
                   {/* Cores com efeito de arco em U */}
