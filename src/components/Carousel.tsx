@@ -389,7 +389,7 @@ export default function Carousel() {
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="w-[85%] max-w-lg bg-black/60 border border-white/40 rounded-xl backdrop-blur-xl p-5 shadow-2xl pointer-events-auto overflow-hidden"
+            className="w-[85%] max-w-lg bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto overflow-hidden relative"
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ 
               opacity: 1, 
@@ -416,9 +416,21 @@ export default function Carousel() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Contorno futurista */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+            <div className="absolute top-0 right-0 h-full w-1 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
+            <div className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
+            
+            {/* Cantos brilhantes */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white/70 rounded-tl-lg" />
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white/70 rounded-tr-lg" />
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white/70 rounded-bl-lg" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white/70 rounded-br-lg" />
+            
             {/* Efeito de brilho nos cantos com movimento */}
             <motion.div 
-              className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl" 
+              className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#5CD9E8]/40 to-transparent rounded-full blur-2xl" 
               animate={{
                 x: [0, 20, 0],
                 y: [0, 10, 0]
@@ -430,7 +442,7 @@ export default function Carousel() {
               }}
             />
             <motion.div 
-              className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl"
+              className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#5CD9E8]/40 to-transparent rounded-full blur-2xl"
               animate={{
                 x: [0, -20, 0],
                 y: [0, -10, 0]
@@ -460,8 +472,8 @@ export default function Carousel() {
               }}
             >
               {/* Cabeçalho com ícone e título */}
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-sm p-2 ring-2 ring-white/20">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-2 ring-2 ring-[#5CD9E8]/60">
                   <Image
                     src={iconSrc}
                     alt={title}
@@ -472,8 +484,12 @@ export default function Carousel() {
                 </div>
                 <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">{title}</h3>
               </div>
-              <div className="text-sm sm:text-base text-white/90 font-iqos leading-relaxed">{content}</div>
+              <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">{content}</div>
             </motion.div>
+            
+            {/* Grafismo futurista */}
+            <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#5CD9E8]/30 rounded-tr-3xl" />
+            <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#5CD9E8]/30 rounded-bl-3xl" />
           </motion.div>
         </motion.div>
       </>
