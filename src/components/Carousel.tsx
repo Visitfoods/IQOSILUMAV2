@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, MouseEvent } from "react";
+import { useState, useEffect, useRef, useCallback, MouseEvent as ReactMouseEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, CubeIcon } from "@heroicons/react/24/outline";
@@ -58,8 +58,15 @@ export default function Carousel() {
   const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
   const [showModel3D, setShowModel3D] = useState(false);
   const [activePopup, setActivePopup] = useState<string | null>(null);
+  const [activeIconRef, setActiveIconRef] = useState<HTMLDivElement | null>(null);
+  const iconRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const pathname = usePathname();
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+  // Criar refs callbacks para cada ícone
+  const setIconRef = useCallback((name: string) => (node: HTMLDivElement | null) => {
+    iconRefs.current[name] = node;
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -257,17 +264,24 @@ export default function Carousel() {
   };
 
   // Função para lidar com cliques nos ícones
-  const handleIconClick = (iconName: string, event: MouseEvent) => {
+  const handleIconClick = (iconName: string, event: ReactMouseEvent) => {
     event.stopPropagation(); // Evita propagação do clique
+    
     // Se já estiver aberto, fecha apenas
     if (activePopup === iconName) {
       setActivePopup(null);
+      setActiveIconRef(null);
       return;
     }
+    
+    // Guarda a referência do ícone clicado
+    const iconRef = iconRefs.current[iconName];
+    setActiveIconRef(iconRef);
     
     // Efeito de paralaxe - primeiro fecha o popup atual, depois abre o novo
     if (activePopup) {
       setActivePopup(null);
+      setActiveIconRef(null);
       setTimeout(() => {
         setActivePopup(iconName);
       }, 300);
@@ -276,11 +290,18 @@ export default function Carousel() {
     }
   };
 
-  // Fechar popup quando clicar fora dele
+  // Fechar popup quando clicar fora dele ou do ícone ativo
   useEffect(() => {
-    const handleClickOutside = () => {
+    const handleClickOutside = (event: Event) => {
       if (activePopup) {
-        setActivePopup(null);
+        const popup = document.getElementById('popup-container');
+        const isClickInsidePopup = popup && popup.contains(event.target as Node);
+        const isClickInsideIcon = activeIconRef && activeIconRef.contains(event.target as Node);
+        
+        if (!isClickInsidePopup && !isClickInsideIcon) {
+          setActivePopup(null);
+          setActiveIconRef(null);
+        }
       }
     };
 
@@ -288,65 +309,156 @@ export default function Carousel() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [activePopup]);
-
-  // Componente de Popup
-  const IconPopup = ({ title, children, isOpen }: { title: string, children: React.ReactNode, isOpen: boolean }) => {
-    return (
-      <AnimatePresence>
-        {isOpen && (
+  }, [activePopup, activeIconRef]);
+  
+  // Componente GlobalPopup para renderizar o popup fora dos containers dos ícones
+  const GlobalPopup = () => {
+    // Não renderizar nada se não houver popup ativo
+    if (!activePopup || !activeIconRef) return null;
+    
+    // Determinar conteúdo do popup com base no ícone ativo
+    let title = '';
+    let content: React.ReactNode = null;
+    
+    switch (activePopup) {
+      case "FlexPuff":
+      case "FlexPuffONE":
+        title = "Flex Puff";
+        content = <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>;
+        break;
+      case "FlexBattery":
+        title = "Flex Battery";
+        content = (
           <>
-            {/* Overlay que desfoca o resto da interface */}
+            <p>Já é possível adaptar a bateria do seu dispositivo com o FlexBattery:</p>
+            <p className="mt-2"><span className="font-bold">Modo Eco</span><br/>Permite prolongar o tempo de vida útil da bateria do equipamento até um ano**;</p>
+            <p className="mt-2">ou</p>
+            <p className="mt-2"><span className="font-bold">Modo Desempenho</span><br/>Até 3 utilizações consecutivas**</p>
+          </>
+        );
+        break;
+      case "ModoPausa":
+        title = "Modo Pausa";
+        content = (
+          <>
+            <p>Já é possível interromper e recomeçar a utilização até 8 minutos, sem que o SMARTCORE STICK™ fique inutilizado, com o novo Modo Pausa.</p>
+            <p className="mt-2 text-white/70 italic">Apenas disponível no Modo Desempenho</p>
+          </>
+        );
+        break;
+      case "EcraTatil":
+        title = "Ecrã Tátil";
+        content = <p>O novo Ecrã Tátil permite acompanhar todas as informações relativas ao estado do dispositivo e personalizar a sua utilização.</p>;
+        break;
+      case "InicioAutomatico":
+        title = "Início Automático";
+        content = <p>O ILUMAi ONE permite iniciar a utilização automaticamente ao inspirar, sem necessidade de premir botões.</p>;
+        break;
+      default:
+        return null;
+    }
+    
+    return (
+      <>
+        {/* Overlay que desfoca o resto da interface mas não o ícone ativo */}
+        <motion.div 
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={() => {
+            setActivePopup(null);
+            setActiveIconRef(null);
+          }}
+        />
+        
+        {/* Container do popup com paralaxe */}
+        <motion.div
+          id="popup-container"
+          className="fixed inset-0 flex items-center justify-center z-[150] pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.div
+            className="w-[85%] max-w-lg bg-black/60 border border-white/40 rounded-xl backdrop-blur-xl p-5 shadow-2xl pointer-events-auto overflow-hidden"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              y: 0,
+              rotateX: [-2, 2, -2],
+              rotateY: [1, -1, 1]
+            }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ 
+              type: "spring", 
+              damping: 20, 
+              stiffness: 300,
+              rotateX: {
+                repeat: Infinity,
+                duration: 5,
+                ease: "easeInOut"
+              },
+              rotateY: {
+                repeat: Infinity,
+                duration: 7,
+                ease: "easeInOut"
+              }
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Efeito de brilho nos cantos com movimento */}
             <motion.div 
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setActivePopup(null);
+              className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl" 
+              animate={{
+                x: [0, 20, 0],
+                y: [0, 10, 0]
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div 
+              className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl"
+              animate={{
+                x: [0, -20, 0],
+                y: [0, -10, 0]
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
             />
             
-            {/* Container do popup com paralaxe */}
-            <motion.div
-              className="fixed inset-0 flex items-center justify-center z-[150] pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+            <motion.div 
+              className="relative"
+              initial={{ y: 10 }}
+              animate={{ 
+                y: 0,
+                x: [0, -3, 0, 3, 0],
+              }}
+              transition={{ 
+                delay: 0.1, 
+                duration: 0.4,
+                x: {
+                  duration: 15,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
             >
-              <motion.div
-                className="w-[85%] max-w-lg bg-black/60 border border-white/40 rounded-xl backdrop-blur-xl p-5 shadow-2xl pointer-events-auto overflow-hidden"
-                initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                transition={{ 
-                  type: "spring", 
-                  damping: 20, 
-                  stiffness: 300 
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Efeito de brilho nos cantos */}
-                <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl" />
-                <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-2xl" />
-                
-                <motion.div 
-                  className="relative"
-                  initial={{ y: 10 }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.4 }}
-                >
-                  <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white mb-3">{title}</h3>
-                  <div className="text-sm sm:text-base text-white/90 font-iqos leading-relaxed">{children}</div>
-                </motion.div>
-              </motion.div>
+              <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white mb-3">{title}</h3>
+              <div className="text-sm sm:text-base text-white/90 font-iqos leading-relaxed">{content}</div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </motion.div>
+        </motion.div>
+      </>
     );
   };
 
@@ -356,6 +468,11 @@ export default function Carousel() {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
+      {/* Renderizar o popup globalmente, fora dos containers dos ícones */}
+      <AnimatePresence>
+        {activePopup && <GlobalPopup />}
+      </AnimatePresence>
+      
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative w-full max-w-[1400px] h-full md:h-[80vh] px-4">
           {viewMode === "carousel" ? (
@@ -518,9 +635,10 @@ export default function Carousel() {
                         {/* Ícone esquerdo para ILUMAi ONE */}
                         <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("FlexPuffONE")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "FlexPuffONE" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("FlexPuffONE", e)}
                           >
                             <Image
@@ -531,12 +649,6 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
-                            
-                            {activePopup === "FlexPuffONE" && (
-                              <IconPopup title="Flex Puff" isOpen={true}>
-                                <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
 
@@ -578,9 +690,10 @@ export default function Carousel() {
                         {/* Ícone direito para ILUMAi ONE */}
                         <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("InicioAutomatico")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "InicioAutomatico" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("InicioAutomatico", e)}
                           >
                             <Image
@@ -591,12 +704,6 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Início Automático</span>
-                            
-                            {activePopup === "InicioAutomatico" && (
-                              <IconPopup title="Início Automático" isOpen={true}>
-                                <p>O ILUMAi ONE permite iniciar a utilização automaticamente ao inspirar, sem necessidade de premir botões.</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
                       </>
@@ -605,9 +712,10 @@ export default function Carousel() {
                         {/* Ícones à esquerda para ILUMAi e ILUMAi PRIME */}
                         <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("FlexPuff")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "FlexPuff" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("FlexPuff", e)}
                           >
                             <Image
@@ -618,20 +726,15 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
-                            
-                            {activePopup === "FlexPuff" && (
-                              <IconPopup title="Flex Puff" isOpen={true}>
-                                <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
 
                         <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("FlexBattery")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "FlexBattery" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("FlexBattery", e)}
                           >
                             <Image
@@ -642,15 +745,6 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
-                            
-                            {activePopup === "FlexBattery" && (
-                              <IconPopup title="Flex Battery" isOpen={true}>
-                                <p>Já é possível adaptar a bateria do seu dispositivo com o FlexBattery:</p>
-                                <p className="mt-2"><span className="font-bold">Modo Eco</span><br/>Permite prolongar o tempo de vida útil da bateria do equipamento até um ano**;</p>
-                                <p className="mt-2">ou</p>
-                                <p className="mt-2"><span className="font-bold">Modo Desempenho</span><br/>Até 3 utilizações consecutivas**</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
 
@@ -692,9 +786,10 @@ export default function Carousel() {
                         {/* Ícones à direita para ILUMAi e ILUMAi PRIME */}
                         <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("ModoPausa")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "ModoPausa" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("ModoPausa", e)}
                           >
                             <Image
@@ -705,21 +800,15 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
-                            
-                            {activePopup === "ModoPausa" && (
-                              <IconPopup title="Modo Pausa" isOpen={true}>
-                                <p>Já é possível interromper e recomeçar a utilização até 8 minutos, sem que o SMARTCORE STICK™ fique inutilizado, com o novo Modo Pausa.</p>
-                                <p className="mt-2 text-white/70 italic">Apenas disponível no Modo Desempenho</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
 
                         <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
                           <motion.div 
+                            ref={setIconRef("EcraTatil")}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="relative cursor-pointer"
+                            className={`relative cursor-pointer ${activePopup === "EcraTatil" ? "z-[101]" : ""}`}
                             onClick={(e) => handleIconClick("EcraTatil", e)}
                           >
                             <Image
@@ -730,12 +819,6 @@ export default function Carousel() {
                               className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                             />
                             <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
-                            
-                            {activePopup === "EcraTatil" && (
-                              <IconPopup title="Ecrã Tátil" isOpen={true}>
-                                <p>O novo Ecrã Tátil permite acompanhar todas as informações relativas ao estado do dispositivo e personalizar a sua utilização.</p>
-                              </IconPopup>
-                            )}
                           </motion.div>
                         </div>
                       </>
