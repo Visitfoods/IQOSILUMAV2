@@ -319,15 +319,18 @@ export default function Carousel() {
     // Determinar conteúdo do popup com base no ícone ativo
     let title = '';
     let content: React.ReactNode = null;
+    let iconSrc = '';
     
     switch (activePopup) {
       case "FlexPuff":
       case "FlexPuffONE":
         title = "Flex Puff";
+        iconSrc = "/IQOSILUMAV2/Icons/FlexPuff.svg";
         content = <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>;
         break;
       case "FlexBattery":
         title = "Flex Battery";
+        iconSrc = "/IQOSILUMAV2/Icons/FlexBattery.svg";
         content = (
           <>
             <p>Já é possível adaptar a bateria do seu dispositivo com o FlexBattery:</p>
@@ -339,6 +342,7 @@ export default function Carousel() {
         break;
       case "ModoPausa":
         title = "Modo Pausa";
+        iconSrc = "/IQOSILUMAV2/Icons/Modo Pausa.svg";
         content = (
           <>
             <p>Já é possível interromper e recomeçar a utilização até 8 minutos, sem que o SMARTCORE STICK™ fique inutilizado, com o novo Modo Pausa.</p>
@@ -348,10 +352,12 @@ export default function Carousel() {
         break;
       case "EcraTatil":
         title = "Ecrã Tátil";
+        iconSrc = "/IQOSILUMAV2/Icons/EcraTatil.svg";
         content = <p>O novo Ecrã Tátil permite acompanhar todas as informações relativas ao estado do dispositivo e personalizar a sua utilização.</p>;
         break;
       case "InicioAutomatico":
         title = "Início Automático";
+        iconSrc = "/IQOSILUMAV2/Icons/InicioAutomatico.svg";
         content = <p>O ILUMAi ONE permite iniciar a utilização automaticamente ao inspirar, sem necessidade de premir botões.</p>;
         break;
       default:
@@ -453,7 +459,19 @@ export default function Carousel() {
                 }
               }}
             >
-              <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white mb-3">{title}</h3>
+              {/* Cabeçalho com ícone e título */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-white/10 backdrop-blur-sm p-2 ring-2 ring-white/20">
+                  <Image
+                    src={iconSrc}
+                    alt={title}
+                    width={48}
+                    height={48}
+                    className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                  />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">{title}</h3>
+              </div>
               <div className="text-sm sm:text-base text-white/90 font-iqos leading-relaxed">{content}</div>
             </motion.div>
           </motion.div>
