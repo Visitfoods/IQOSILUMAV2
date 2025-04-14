@@ -524,7 +524,7 @@ export default function Carousel() {
                     )}
                   </div>
 
-                  {/* Cores com efeito de arco */}
+                  {/* Cores com efeito de arco em U */}
                   <div className="absolute left-0 right-0 bottom-[15%] sm:bottom-[27%] md:bottom-[29%]">
                     <div className="relative flex justify-center items-center">
                       {colorConfig
@@ -537,10 +537,11 @@ export default function Carousel() {
                           
                           // Criar efeito de arco usando uma função quadrática
                           const xSpacing = 60; // Espaçamento horizontal entre as bolas
-                          const maxYOffset = 30; // Altura máxima do arco (agora positivo para curvar para baixo)
+                          const maxYOffset = 40; // Altura máxima do arco (positivo para curvar para baixo)
                           
-                          // Função quadrática para criar o arco em U
-                          const yOffset = maxYOffset * Math.pow(offset / centerIndex, 2);
+                          // Função quadrática para criar o arco em U (parábola para baixo)
+                          const normalizedOffset = offset / centerIndex;
+                          const yOffset = maxYOffset * (Math.pow(normalizedOffset, 2) - 1);
                           
                           return (
                             <button
