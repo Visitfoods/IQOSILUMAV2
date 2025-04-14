@@ -401,8 +401,8 @@ export default function Carousel() {
               </filter>
             </defs>
             <rect 
-              x="calc(50% - 43%)"
-              y="calc(50% - 22%)"
+              x="calc(50% - 2%)"
+              y="calc(50% - 2%)"
               width="86%"
               height="44%"
               rx="12" 
