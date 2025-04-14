@@ -1,7 +1,12 @@
-import { metadata } from './metadata';
-import ClientLayout from './layout.client';
+import type { Metadata } from "next";
+import "./globals.css";
+import ClientLayout from "../components/ClientLayout";
+import Frame from "../components/Frame";
 
-export { metadata };
+export const metadata: Metadata = {
+  title: "ILUMAi",
+  description: "ILUMAi - Descobre o teu ILUMAi",
+};
 
 export default function RootLayout({
   children,
@@ -12,6 +17,7 @@ export default function RootLayout({
     <html lang="pt" className="h-full overflow-hidden">
       <body className="h-full overflow-hidden">
         <main className="relative h-screen overflow-hidden">
+          <Frame />
           <ClientLayout>{children}</ClientLayout>
         </main>
       </body>
