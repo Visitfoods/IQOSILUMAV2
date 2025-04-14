@@ -3,19 +3,21 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon, CubeIcon } from "@heroicons/react/24/outline";
+import ModelViewer3D from "./ModelViewer3D";
 
 interface Machine {
   id: number;
   name: string;
   image: string;
   baseModel: string;
+  modelPath?: string;
 }
 
 type ColorVariant = "Breeze" | "Midnight" | "Leaf" | "Terracotta" | "Violet";
 
 const machines: Machine[] = [
-  { id: 1, name: "ILUMAi BREEZE", image: "/IMG/ILUMAi/ILUMAi_BREEZE.png", baseModel: "ILUMAi" },
+  { id: 1, name: "ILUMAi BREEZE", image: "/IMG/ILUMAi/ILUMAi_BREEZE.png", baseModel: "ILUMAi", modelPath: "/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" },
   { id: 2, name: "ILUMAi ONE", image: "/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", baseModel: "ILUMAi-ONE" },
   { id: 3, name: "ILUMAi PRIME", image: "/IMG/ILUMAi-PRIME/ILUMAi-PRIME_BREEZE.png", baseModel: "ILUMAi-PRIME" },
 ];
@@ -37,6 +39,7 @@ export default function Carousel() {
   const [viewMode, setViewMode] = useState<"carousel" | "detail">("carousel");
   const [selectedColor, setSelectedColor] = useState<ColorVariant>("Breeze");
   const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
+  const [showModel3D, setShowModel3D] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -221,6 +224,19 @@ export default function Carousel() {
   };
 
   const positionedMachines = getPositionedMachines();
+
+  // Função para obter o caminho do modelo 3D baseado no modelo e cor selecionada
+  const getModelPath = (machine: Machine) => {
+    if (!machine.modelPath) return null;
+    
+    // Por enquanto retornamos apenas o modelo padrão, mas no futuro podemos ter diferentes modelos por cor
+    return machine.modelPath;
+  };
+
+  // Alternar entre imagem 2D e modelo 3D
+  const toggleModelView = () => {
+    setShowModel3D(prev => !prev);
+  };
 
   if (!isMounted) {
     return null;
@@ -458,14 +474,37 @@ export default function Carousel() {
                   </div>
 
                   <div className="relative w-full flex-1 flex items-center justify-center -mt-65 sm:-mt-70 md:-mt-80">
-                    <Image
-                      src={getImagePath(selectedMachine!, selectedColor)}
-                      alt={selectedMachine?.name || ""}
-                      width={400}
-                      height={400}
-                      className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
-                      priority
-                    />
+                    {/* Botão "Ver em 3D" */}
+                    {selectedMachine?.modelPath && (
+                      <button
+                        onClick={toggleModelView}
+                        className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
+                        aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
+                      >
+                        <CubeIcon className="w-5 h-5" />
+                        <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
+                      </button>
+                    )}
+                    
+                    {showModel3D && selectedMachine?.modelPath ? (
+                      <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                        <ModelViewer3D 
+                          modelPath={getModelPath(selectedMachine) || ""}
+                          scale={7}
+                          position={[0, 0, 0]}
+                          autoRotate={true}
+                        />
+                      </div>
+                    ) : (
+                      <Image
+                        src={getImagePath(selectedMachine!, selectedColor)}
+                        alt={selectedMachine?.name || ""}
+                        width={400}
+                        height={400}
+                        className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                        priority
+                      />
+                    )}
                   </div>
 
                   {/* Cores com mais espaçamento e posicionadas mais abaixo */}
@@ -476,7 +515,11 @@ export default function Carousel() {
                         .map((colorObj) => (
                           <button
                             key={colorObj.color}
-                            onClick={() => handleColorChange(colorObj.variant as ColorVariant)}
+                            onClick={() => {
+                              handleColorChange(colorObj.variant as ColorVariant);
+                              // Reset para exibição da imagem 2D ao mudar de cor
+                              setShowModel3D(false);
+                            }}
                             className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full ${getColorStyle(
                               colorObj.variant as ColorVariant,
                               selectedMachine!
