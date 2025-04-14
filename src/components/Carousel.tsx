@@ -396,27 +396,28 @@ export default function Carousel() {
               key="detail"
               className="relative w-full h-full"
             >
-              <div className="relative h-screen flex flex-col justify-between pb-8 sm:pb-12 md:pb-16">
-                <div className="relative flex-1 flex flex-col items-center justify-center">
-                  {/* Seta para voltar centralizada com círculo e efeito pulsar */}
-                  <div className="w-full flex justify-center mt-16 sm:-mt-4 md:-mt-5 mb-0">
-                    <button
-                      onClick={handleBack}
-                      className="relative text-white p-2 hover:text-gray-300 transition-colors group"
-                      aria-label="Voltar"
-                    >
-                      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-150 group-hover:scale-[1.7] transition-transform duration-300" />
-                      <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-full animate-pulse scale-[1.7] group-hover:scale-[1.9] transition-transform duration-300" />
-                      <ChevronLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10" />
-                    </button>
-                  </div>
+              <div className="relative h-screen flex flex-col">
+                {/* Cabeçalho fixo (seta + título) */}
+                <div className="relative flex flex-col items-center justify-center pt-6 sm:pt-8 md:pt-10">
+                  <button
+                    onClick={handleBack}
+                    className="relative text-white p-2 hover:text-gray-300 transition-colors group mb-4 sm:mb-6 md:mb-8"
+                    aria-label="Voltar"
+                  >
+                    <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-full scale-150 group-hover:scale-[1.7] transition-transform duration-300" />
+                    <div className="absolute inset-0 bg-white/5 backdrop-blur-sm rounded-full animate-pulse scale-[1.7] group-hover:scale-[1.9] transition-transform duration-300" />
+                    <ChevronLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 relative z-10" />
+                  </button>
 
-                  <h1 className="text-white font-iqos text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-6 md:mb-8">
+                  <h1 className="text-white font-iqos text-2xl sm:text-3xl md:text-4xl">
                     {formatModelName(selectedMachine?.baseModel || "")}
                   </h1>
+                </div>
 
-                  {/* Container principal com grid para melhor distribuição dos elementos */}
-                  <div className="relative w-full flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-6 md:gap-8 px-6 sm:px-10 md:px-16">
+                {/* Conteúdo principal centralizado */}
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  {/* Grid para ícones e dispositivo */}
+                  <div className="relative w-full grid grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-6 md:gap-8 px-6 sm:px-10 md:px-16">
                     {/* Ícones */}
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
@@ -568,50 +569,51 @@ export default function Carousel() {
                       </>
                     )}
                   </div>
+                </div>
 
+                {/* Rodapé com as cores */}
+                <div className="pb-8 sm:pb-12 md:pb-16">
                   {/* Cores com efeito de arco em U */}
-                  <div className="absolute left-0 right-0 bottom-[15%] sm:bottom-[27%] md:bottom-[29%]">
-                    <div className="relative flex justify-center items-center">
-                      {colorConfig
-                        .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
-                        .map((colorObj, index, array) => {
-                          // Calcular posição no arco
-                          const totalItems = array.length;
-                          const centerIndex = (totalItems - 1) / 2;
-                          const offset = index - centerIndex;
-                          
-                          // Criar efeito de arco usando uma função quadrática
-                          const xSpacing = 60; // Espaçamento horizontal entre as bolas
-                          const maxYOffset = 40; // Altura máxima do arco
-                          
-                          // Função quadrática para criar o arco em forma de U invertido (para cima)
-                          const normalizedOffset = offset / centerIndex;
-                          const yOffset = -maxYOffset * Math.pow(normalizedOffset, 2);
-                          
-                          return (
-                            <button
-                              key={colorObj.color}
-                              onClick={() => {
-                                handleColorChange(colorObj.variant as ColorVariant);
-                                setShowModel3D(false);
-                              }}
-                              style={{
-                                transform: `translate(${offset * xSpacing}px, ${yOffset}px)`,
-                                transition: 'transform 0.3s ease-out'
-                              }}
-                              className={`absolute w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full ${getColorStyle(
-                                colorObj.variant as ColorVariant,
-                                selectedMachine!
-                              )} ${
-                                selectedColor === colorObj.variant
-                                  ? "ring-2 ring-offset-2 ring-white scale-110 z-10"
-                                  : "hover:scale-105 transition-transform"
-                              }`}
-                              aria-label={`Selecionar cor ${colorObj.label}`}
-                            />
-                          );
-                        })}
-                    </div>
+                  <div className="relative flex justify-center items-center">
+                    {colorConfig
+                      .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
+                      .map((colorObj, index, array) => {
+                        // Calcular posição no arco
+                        const totalItems = array.length;
+                        const centerIndex = (totalItems - 1) / 2;
+                        const offset = index - centerIndex;
+                        
+                        // Criar efeito de arco usando uma função quadrática
+                        const xSpacing = 60; // Espaçamento horizontal entre as bolas
+                        const maxYOffset = 40; // Altura máxima do arco
+                        
+                        // Função quadrática para criar o arco em forma de U invertido (para cima)
+                        const normalizedOffset = offset / centerIndex;
+                        const yOffset = -maxYOffset * Math.pow(normalizedOffset, 2);
+                        
+                        return (
+                          <button
+                            key={colorObj.color}
+                            onClick={() => {
+                              handleColorChange(colorObj.variant as ColorVariant);
+                              setShowModel3D(false);
+                            }}
+                            style={{
+                              transform: `translate(${offset * xSpacing}px, ${yOffset}px)`,
+                              transition: 'transform 0.3s ease-out'
+                            }}
+                            className={`absolute w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full ${getColorStyle(
+                              colorObj.variant as ColorVariant,
+                              selectedMachine!
+                            )} ${
+                              selectedColor === colorObj.variant
+                                ? "ring-2 ring-offset-2 ring-white scale-110 z-10"
+                                : "hover:scale-105 transition-transform"
+                            }`}
+                            aria-label={`Selecionar cor ${colorObj.label}`}
+                          />
+                        );
+                      })}
                   </div>
                 </div>
               </div>
