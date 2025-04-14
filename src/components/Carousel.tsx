@@ -569,53 +569,55 @@ export default function Carousel() {
                       </>
                     )}
                   </div>
-                </div>
 
-                {/* Rodapé com as cores */}
-                <div className="pb-8 sm:pb-12 md:pb-16">
                   {/* Cores com efeito de arco em U */}
-                  <div className="relative flex justify-center items-center">
-                    {colorConfig
-                      .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
-                      .map((colorObj, index, array) => {
-                        // Calcular posição no arco
-                        const totalItems = array.length;
-                        const centerIndex = (totalItems - 1) / 2;
-                        const offset = index - centerIndex;
-                        
-                        // Criar efeito de arco usando uma função quadrática
-                        const xSpacing = 60; // Espaçamento horizontal entre as bolas
-                        const maxYOffset = 40; // Altura máxima do arco
-                        
-                        // Função quadrática para criar o arco em forma de U invertido (para cima)
-                        const normalizedOffset = offset / centerIndex;
-                        const yOffset = -maxYOffset * Math.pow(normalizedOffset, 2);
-                        
-                        return (
-                          <button
-                            key={colorObj.color}
-                            onClick={() => {
-                              handleColorChange(colorObj.variant as ColorVariant);
-                              setShowModel3D(false);
-                            }}
-                            style={{
-                              transform: `translate(${offset * xSpacing}px, ${yOffset}px)`,
-                              transition: 'transform 0.3s ease-out'
-                            }}
-                            className={`absolute w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full ${getColorStyle(
-                              colorObj.variant as ColorVariant,
-                              selectedMachine!
-                            )} ${
-                              selectedColor === colorObj.variant
-                                ? "ring-2 ring-offset-2 ring-white scale-110 z-10"
-                                : "hover:scale-105 transition-transform"
-                            }`}
-                            aria-label={`Selecionar cor ${colorObj.label}`}
-                          />
-                        );
-                      })}
+                  <div className="relative mt-8 sm:mt-12 md:mt-16">
+                    <div className="relative flex justify-center items-center">
+                      {colorConfig
+                        .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
+                        .map((colorObj, index, array) => {
+                          // Calcular posição no arco
+                          const totalItems = array.length;
+                          const centerIndex = (totalItems - 1) / 2;
+                          const offset = index - centerIndex;
+                          
+                          // Criar efeito de arco usando uma função quadrática
+                          const xSpacing = 60; // Espaçamento horizontal entre as bolas
+                          const maxYOffset = 40; // Altura máxima do arco
+                          
+                          // Função quadrática para criar o arco em forma de U invertido (para cima)
+                          const normalizedOffset = offset / centerIndex;
+                          const yOffset = -maxYOffset * Math.pow(normalizedOffset, 2);
+                          
+                          return (
+                            <button
+                              key={colorObj.color}
+                              onClick={() => {
+                                handleColorChange(colorObj.variant as ColorVariant);
+                                setShowModel3D(false);
+                              }}
+                              style={{
+                                transform: `translate(${offset * xSpacing}px, ${yOffset}px)`,
+                                transition: 'transform 0.3s ease-out'
+                              }}
+                              className={`absolute w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full ${getColorStyle(
+                                colorObj.variant as ColorVariant,
+                                selectedMachine!
+                              )} ${
+                                selectedColor === colorObj.variant
+                                  ? "ring-2 ring-offset-2 ring-white scale-110 z-10"
+                                  : "hover:scale-105 transition-transform"
+                              }`}
+                              aria-label={`Selecionar cor ${colorObj.label}`}
+                            />
+                          );
+                        })}
+                    </div>
                   </div>
                 </div>
+
+                {/* Espaço para padding inferior */}
+                <div className="h-8 sm:h-12 md:h-16" />
               </div>
             </motion.div>
           )}
