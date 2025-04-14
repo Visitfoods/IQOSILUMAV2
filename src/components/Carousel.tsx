@@ -411,7 +411,7 @@ export default function Carousel() {
                     </button>
                   </div>
 
-                  <h1 className="text-white font-iqos text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-6 md:mb-8 mt-20 sm:mt-16 md:mt-20">
+                  <h1 className="text-white font-iqos text-2xl sm:text-3xl md:text-4xl mb-4 sm:mb-6 md:mb-8">
                     {formatModelName(selectedMachine?.baseModel || "")}
                   </h1>
 
@@ -421,7 +421,7 @@ export default function Carousel() {
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
                         {/* Ícone esquerdo para ILUMAi ONE */}
-                        <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center self-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
@@ -433,7 +433,7 @@ export default function Carousel() {
                         </div>
 
                         {/* Imagem central do dispositivo */}
-                        <div className="relative flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
+                        <div className="relative flex items-center justify-center self-center">
                           {/* Botão "Ver em 3D" */}
                           {selectedMachine?.modelPath && (
                             <button
@@ -447,7 +447,7 @@ export default function Carousel() {
                           )}
                           
                           {showModel3D && selectedMachine?.modelPath ? (
-                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px]">
                               <ModelViewer3D 
                                 modelPath={getModelPath(selectedMachine) || ""}
                                 scale={7}
@@ -461,14 +461,14 @@ export default function Carousel() {
                               alt={selectedMachine?.name || ""}
                               width={400}
                               height={400}
-                              className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                              className="w-32 sm:w-45 md:w-50 h-auto object-contain"
                               priority
                             />
                           )}
                         </div>
 
                         {/* Ícone direito para ILUMAi ONE */}
-                        <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center self-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
@@ -482,7 +482,7 @@ export default function Carousel() {
                     ) : (
                       <>
                         {/* Grupo de ícones à esquerda para ILUMAi e ILUMAi PRIME */}
-                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16">
+                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16 self-center">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/FlexPuff.svg"
@@ -507,7 +507,7 @@ export default function Carousel() {
                         </div>
 
                         {/* Imagem central do dispositivo */}
-                        <div className="relative flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
+                        <div className="relative flex items-center justify-center self-center">
                           {/* Botão "Ver em 3D" */}
                           {selectedMachine?.modelPath && (
                             <button
@@ -521,7 +521,7 @@ export default function Carousel() {
                           )}
                           
                           {showModel3D && selectedMachine?.modelPath ? (
-                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px]">
                               <ModelViewer3D 
                                 modelPath={getModelPath(selectedMachine) || ""}
                                 scale={7}
@@ -535,14 +535,14 @@ export default function Carousel() {
                               alt={selectedMachine?.name || ""}
                               width={400}
                               height={400}
-                              className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                              className="w-32 sm:w-45 md:w-50 h-auto object-contain"
                               priority
                             />
                           )}
                         </div>
 
                         {/* Grupo de ícones à direita para ILUMAi e ILUMAi PRIME */}
-                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16">
+                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16 self-center">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
