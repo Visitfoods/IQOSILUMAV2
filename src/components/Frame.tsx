@@ -12,7 +12,7 @@ export default function Frame() {
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',
-          transform: 'scale(1.15)',
+          transform: 'scale(1.1)',
         }}
       />
     </div>
