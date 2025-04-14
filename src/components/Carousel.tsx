@@ -416,7 +416,52 @@ export default function Carousel() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Contorno futurista */}
+            {/* Efeito de contorno "snake" */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" xmlns="http://www.w3.org/2000/svg">
+              <linearGradient id="snakeGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#5CD9E8" stopOpacity="0" />
+                <stop offset="50%" stopColor="#5CD9E8" stopOpacity="1" />
+                <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0" />
+              </linearGradient>
+              <rect 
+                x="1" 
+                y="1" 
+                width="calc(100% - 2px)" 
+                height="calc(100% - 2px)" 
+                rx="10" 
+                ry="10" 
+                fill="none" 
+                stroke="url(#snakeGradient2)" 
+                strokeWidth="3"
+                className="snake-path-refined"
+              />
+            </svg>
+
+            <style jsx global>{`
+              @keyframes snakeAnim {
+                0% {
+                  stroke-dashoffset: 1000;
+                }
+                100% {
+                  stroke-dashoffset: 0;
+                }
+              }
+
+              .snake-path {
+                stroke-dasharray: 50 150;
+                stroke-linecap: round;
+                animation: snakeAnim 10s linear infinite;
+              }
+              
+              .snake-path-refined {
+                stroke-dasharray: 30 200;
+                stroke-linecap: round;
+                animation: snakeAnim 8s linear infinite;
+                filter: drop-shadow(0 0 5px #5CD9E8);
+              }
+            `}</style>
+
+            {/* Contorno futurista estático */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
             <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
             <div className="absolute top-0 right-0 h-full w-1 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
@@ -427,6 +472,51 @@ export default function Carousel() {
             <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white/70 rounded-tr-lg" />
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white/70 rounded-bl-lg" />
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white/70 rounded-br-lg" />
+
+            {/* Versão refinada do SVG snake (efeito mais suave) */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" xmlns="http://www.w3.org/2000/svg">
+              <linearGradient id="snakeGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#5CD9E8" stopOpacity="0" />
+                <stop offset="50%" stopColor="#5CD9E8" stopOpacity="1" />
+                <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0" />
+              </linearGradient>
+              <rect 
+                x="1" 
+                y="1" 
+                width="calc(100% - 2px)" 
+                height="calc(100% - 2px)" 
+                rx="10" 
+                ry="10" 
+                fill="none" 
+                stroke="url(#snakeGradient2)" 
+                strokeWidth="3"
+                className="snake-path-refined"
+              />
+            </svg>
+
+            <style jsx global>{`
+              @keyframes snakeAnim {
+                0% {
+                  stroke-dashoffset: 1000;
+                }
+                100% {
+                  stroke-dashoffset: 0;
+                }
+              }
+
+              .snake-path {
+                stroke-dasharray: 50 150;
+                stroke-linecap: round;
+                animation: snakeAnim 10s linear infinite;
+              }
+              
+              .snake-path-refined {
+                stroke-dasharray: 30 200;
+                stroke-linecap: round;
+                animation: snakeAnim 8s linear infinite;
+                filter: drop-shadow(0 0 5px #5CD9E8);
+              }
+            `}</style>
             
             {/* Efeito de brilho nos cantos com movimento */}
             <motion.div 
