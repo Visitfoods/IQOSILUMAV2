@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, CubeIcon } from "@heroicons/react/24/outline";
 import ModelViewer3D from "./ModelViewer3D";
+import { usePathname } from "next/navigation";
 
 interface Machine {
   id: number;
@@ -17,9 +18,25 @@ interface Machine {
 type ColorVariant = "Breeze" | "Midnight" | "Leaf" | "Terracotta" | "Violet";
 
 const machines: Machine[] = [
-  { id: 1, name: "ILUMAi BREEZE", image: "/IMG/ILUMAi/ILUMAi_BREEZE.png", baseModel: "ILUMAi", modelPath: "/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" },
-  { id: 2, name: "ILUMAi ONE", image: "/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", baseModel: "ILUMAi-ONE" },
-  { id: 3, name: "ILUMAi PRIME", image: "/IMG/ILUMAi-PRIME/ILUMAi-PRIME_BREEZE.png", baseModel: "ILUMAi-PRIME" },
+  { 
+    id: 1, 
+    name: "ILUMAi BREEZE", 
+    image: "/IQOSILUMAV2/IMG/ILUMAi/ILUMAi_BREEZE.png", 
+    baseModel: "ILUMAi", 
+    modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
+  },
+  { 
+    id: 2, 
+    name: "ILUMAi ONE", 
+    image: "/IQOSILUMAV2/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", 
+    baseModel: "ILUMAi-ONE" 
+  },
+  { 
+    id: 3, 
+    name: "ILUMAi PRIME", 
+    image: "/IQOSILUMAV2/IMG/ILUMAi-PRIME/ILUMAi-PRIME_BREEZE.png", 
+    baseModel: "ILUMAi-PRIME" 
+  },
 ];
 
 const colorConfig = [
@@ -40,6 +57,8 @@ export default function Carousel() {
   const [selectedColor, setSelectedColor] = useState<ColorVariant>("Breeze");
   const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
   const [showModel3D, setShowModel3D] = useState(false);
+  const pathname = usePathname();
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
   useEffect(() => {
     setIsMounted(true);
@@ -133,7 +152,7 @@ export default function Carousel() {
     } else if (colorVariant === "Violet") {
       colorForPath = "-VIOLET";
     }
-    return `/IMG/${machine.baseModel}/${machine.baseModel}_${colorForPath}.png`;
+    return `/IQOSILUMAV2/IMG/${machine.baseModel}/${machine.baseModel}_${colorForPath}.png`;
   };
 
   const getColorStyle = (colorVariant: ColorVariant, machine: Machine) => {
@@ -225,12 +244,10 @@ export default function Carousel() {
 
   const positionedMachines = getPositionedMachines();
 
-  // Função para obter o caminho do modelo 3D baseado no modelo e cor selecionada
+  // Função para obter o caminho do modelo 3D
   const getModelPath = (machine: Machine) => {
     if (!machine.modelPath) return null;
-    
-    // Por enquanto retornamos apenas o modelo padrão, mas no futuro podemos ter diferentes modelos por cor
-    return machine.modelPath;
+    return `${basePath}${machine.modelPath}`;
   };
 
   // Alternar entre imagem 2D e modelo 3D
@@ -404,7 +421,7 @@ export default function Carousel() {
                       <>
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/FlexPuff.svg"
+                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
                             width={32}
                             height={32}
@@ -415,7 +432,7 @@ export default function Carousel() {
 
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/InicioAutomatico.svg"
+                            src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
                             width={32}
                             height={32}
@@ -428,7 +445,7 @@ export default function Carousel() {
                       <>
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/FlexPuff.svg"
+                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
                             width={32}
                             height={32}
@@ -439,7 +456,7 @@ export default function Carousel() {
 
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/FlexBattery.svg"
+                            src="/IQOSILUMAV2/Icons/FlexBattery.svg"
                             alt="Flex Battery"
                             width={32}
                             height={32}
@@ -450,7 +467,7 @@ export default function Carousel() {
 
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/Modo Pausa.svg"
+                            src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
                             alt="Modo Pausa"
                             width={32}
                             height={32}
@@ -461,7 +478,7 @@ export default function Carousel() {
 
                         <div className="flex flex-col items-center">
                           <Image
-                            src="/Icons/EcraTatil.svg"
+                            src="/IQOSILUMAV2/Icons/EcraTatil.svg"
                             alt="Ecrã Tátil"
                             width={32}
                             height={32}
