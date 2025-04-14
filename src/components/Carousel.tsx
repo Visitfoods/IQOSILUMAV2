@@ -203,50 +203,64 @@ export default function Carousel() {
     enter: (direction: "left" | "right") => ({
       x: direction === "right" ? "100%" : "-100%",
       opacity: 0,
-      scale: 0.5,
-      filter: "blur(2px) brightness(0.7)"
+      scale: 0.8,
+      filter: "blur(4px)",
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 },
+        scale: { duration: 0.4 },
+        filter: { duration: 0.4 }
+      }
     }),
     center: {
-      x: "0%",
+      x: 0,
       opacity: 1,
       scale: 1,
       zIndex: 10,
-      filter: "blur(0px) brightness(1)",
+      filter: "blur(0px)",
       transition: {
-        duration: 0.5,
-        ease: "easeInOut"
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        scale: { duration: 0.4 },
+        filter: { duration: 0.4 }
       }
     },
     left: {
       x: "-30%",
       opacity: 0.7,
-      scale: 0.7,
-      zIndex: 0,
-      filter: "blur(1px) brightness(0.8)",
+      scale: 0.85,
+      zIndex: 5,
+      filter: "blur(2px)",
       transition: {
-        duration: 0.5,
-        ease: "easeInOut"
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        scale: { duration: 0.4 },
+        filter: { duration: 0.4 }
       }
     },
     right: {
       x: "30%",
       opacity: 0.7,
-      scale: 0.7,
-      zIndex: 0,
-      filter: "blur(1px) brightness(0.8)",
+      scale: 0.85,
+      zIndex: 5,
+      filter: "blur(2px)",
       transition: {
-        duration: 0.5,
-        ease: "easeInOut"
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.4 },
+        scale: { duration: 0.4 },
+        filter: { duration: 0.4 }
       }
     },
     exit: (direction: "left" | "right") => ({
       x: direction === "right" ? "-100%" : "100%",
       opacity: 0,
-      scale: 0.5,
-      filter: "blur(2px) brightness(0.7)",
+      scale: 0.8,
+      filter: "blur(4px)",
       transition: {
-        duration: 0.5,
-        ease: "easeInOut"
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.2 },
+        scale: { duration: 0.4 },
+        filter: { duration: 0.4 }
       }
     })
   };
@@ -830,33 +844,62 @@ export default function Carousel() {
                         animate={machine.position}
                         exit="exit"
                         variants={variants}
-                        transition={{ duration: 0.5 }}
-                        style={{ zIndex: machine.position === "center" ? 10 : 1 }}
+                        style={{ 
+                          zIndex: machine.position === "center" ? 10 : 1,
+                          pointerEvents: machine.position === "center" ? "auto" : "none"
+                        }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.2}
+                        onDragEnd={(e, { offset, velocity }) => {
+                          if (isAnimating) return;
+                          
+                          const swipe = offset.x;
+                          
+                          if (Math.abs(swipe) > 50) {
+                            if (swipe < 0) {
+                              handleClick("right");
+                            } else {
+                              handleClick("left");
+                            }
+                          }
+                        }}
                       >
                         {machine.position === "center" && (
-                          <div className="flex flex-col items-center justify-center w-full h-full">
-                            <div 
-                              className="relative w-[65%] sm:w-[55%] md:w-[45%] aspect-square pointer-events-none"
-                            >
+                          <motion.div 
+                            className="flex flex-col items-center justify-center w-full h-full"
+                            initial={{ scale: 0.95, opacity: 0.8 }}
+                            animate={{ 
+                              scale: 1,
+                              opacity: 1,
+                              transition: {
+                                type: "spring",
+                                stiffness: 300,
+                                damping: 25
+                              }
+                            }}
+                          >
+                            <div className="relative w-[65%] sm:w-[55%] md:w-[45%] aspect-square">
                               <Image
                                 src={machine.image}
                                 alt={machine.name}
                                 width={400}
                                 height={400}
-                                className="object-contain w-full h-full relative z-10 animate-scale"
+                                className="object-contain w-full h-full relative z-10"
                                 priority
                                 draggable={false}
                               />
                             </div>
-                          </div>
+                          </motion.div>
                         )}
                         
                         {machine.position !== "center" && (
                           <motion.div 
-                            className="relative w-[45%] sm:w-[35%] md:w-[30%] aspect-square pointer-events-none"
+                            className="relative w-[45%] sm:w-[35%] md:w-[30%] aspect-square"
                             whileHover={{
                               scale: 1.05,
-                              opacity: 0.8,
+                              opacity: 0.9,
+                              filter: "blur(1px)",
                               transition: { duration: 0.2 }
                             }}
                           >
