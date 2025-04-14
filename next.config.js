@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  basePath: '/IQOSILUMAV2',
   images: {
     unoptimized: true,
     remotePatterns: [
