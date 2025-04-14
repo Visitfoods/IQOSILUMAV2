@@ -415,13 +415,13 @@ export default function Carousel() {
                     {formatModelName(selectedMachine?.baseModel || "")}
                   </h1>
 
-                  {/* Container principal com posicionamento relativo para os ícones e padding lateral */}
-                  <div className="relative w-full flex-1 flex items-center justify-center px-6 sm:px-10 md:px-16">
+                  {/* Container principal com grid para melhor distribuição dos elementos */}
+                  <div className="relative w-full flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-6 md:gap-8 px-6 sm:px-10 md:px-16">
                     {/* Ícones */}
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
                         {/* Ícone esquerdo para ILUMAi ONE */}
-                        <div className="absolute left-[8%] sm:left-[12%] md:left-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center">
+                        <div className="flex flex-col items-center justify-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
@@ -432,8 +432,43 @@ export default function Carousel() {
                           <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
                         </div>
 
+                        {/* Imagem central do dispositivo */}
+                        <div className="relative flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
+                          {/* Botão "Ver em 3D" */}
+                          {selectedMachine?.modelPath && (
+                            <button
+                              onClick={toggleModelView}
+                              className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
+                              aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
+                            >
+                              <CubeIcon className="w-5 h-5" />
+                              <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
+                            </button>
+                          )}
+                          
+                          {showModel3D && selectedMachine?.modelPath ? (
+                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                              <ModelViewer3D 
+                                modelPath={getModelPath(selectedMachine) || ""}
+                                scale={7}
+                                position={[0, 0, 0]}
+                                autoRotate={true}
+                              />
+                            </div>
+                          ) : (
+                            <Image
+                              src={getImagePath(selectedMachine!, selectedColor)}
+                              alt={selectedMachine?.name || ""}
+                              width={400}
+                              height={400}
+                              className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                              priority
+                            />
+                          )}
+                        </div>
+
                         {/* Ícone direito para ILUMAi ONE */}
-                        <div className="absolute right-[8%] sm:right-[12%] md:right-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center">
+                        <div className="flex flex-col items-center justify-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
@@ -447,7 +482,7 @@ export default function Carousel() {
                     ) : (
                       <>
                         {/* Grupo de ícones à esquerda para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute left-[8%] sm:left-[12%] md:left-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center space-y-12 sm:space-y-16">
+                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/FlexPuff.svg"
@@ -471,8 +506,43 @@ export default function Carousel() {
                           </div>
                         </div>
 
+                        {/* Imagem central do dispositivo */}
+                        <div className="relative flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
+                          {/* Botão "Ver em 3D" */}
+                          {selectedMachine?.modelPath && (
+                            <button
+                              onClick={toggleModelView}
+                              className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
+                              aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
+                            >
+                              <CubeIcon className="w-5 h-5" />
+                              <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
+                            </button>
+                          )}
+                          
+                          {showModel3D && selectedMachine?.modelPath ? (
+                            <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
+                              <ModelViewer3D 
+                                modelPath={getModelPath(selectedMachine) || ""}
+                                scale={7}
+                                position={[0, 0, 0]}
+                                autoRotate={true}
+                              />
+                            </div>
+                          ) : (
+                            <Image
+                              src={getImagePath(selectedMachine!, selectedColor)}
+                              alt={selectedMachine?.name || ""}
+                              width={400}
+                              height={400}
+                              className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
+                              priority
+                            />
+                          )}
+                        </div>
+
                         {/* Grupo de ícones à direita para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute right-[8%] sm:right-[12%] md:right-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center space-y-12 sm:space-y-16">
+                        <div className="flex flex-col items-center justify-center space-y-12 sm:space-y-16">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
@@ -497,41 +567,6 @@ export default function Carousel() {
                         </div>
                       </>
                     )}
-
-                    {/* Imagem central do dispositivo */}
-                    <div className="relative w-full flex-1 flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
-                      {/* Botão "Ver em 3D" */}
-                      {selectedMachine?.modelPath && (
-                        <button
-                          onClick={toggleModelView}
-                          className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
-                          aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
-                        >
-                          <CubeIcon className="w-5 h-5" />
-                          <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
-                        </button>
-                      )}
-                      
-                      {showModel3D && selectedMachine?.modelPath ? (
-                        <div className="w-full h-[530px] sm:h-[580px] md:h-[620px] mt-0">
-                          <ModelViewer3D 
-                            modelPath={getModelPath(selectedMachine) || ""}
-                            scale={7}
-                            position={[0, 0, 0]}
-                            autoRotate={true}
-                          />
-                        </div>
-                      ) : (
-                        <Image
-                          src={getImagePath(selectedMachine!, selectedColor)}
-                          alt={selectedMachine?.name || ""}
-                          width={400}
-                          height={400}
-                          className="w-32 sm:w-45 md:w-50 h-auto object-contain -mt-24 sm:mt-0"
-                          priority
-                        />
-                      )}
-                    </div>
                   </div>
 
                   {/* Cores com efeito de arco em U */}
