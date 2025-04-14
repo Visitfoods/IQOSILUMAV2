@@ -404,7 +404,7 @@ export default function Carousel() {
               x="calc(50% - 44%)"
               y="calc(50% - 24%)"
               width="88%"
-              height="48%"
+              height="10%"
               rx="12" 
               ry="12" 
               fill="none" 
