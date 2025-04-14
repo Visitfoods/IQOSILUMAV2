@@ -516,10 +516,10 @@ export default function Carousel() {
                   navigateToNextIcon("left");
                 }}
                 whileHover={{ scale: 0.6, opacity: 0.7, filter: "blur(0px)" }}
-                initial={{ opacity: 0, x: "-60%", rotateY: 45, filter: "blur(2px)" }}
-                animate={{ opacity: 0.5, x: "-30%", rotateY: 35, filter: "blur(1px)" }}
-                exit={{ opacity: 0, x: "-60%", rotateY: 45, filter: "blur(2px)" }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                initial={{ x: "-60%", rotateY: 45, filter: "blur(2px)" }}
+                animate={{ x: "-30%", rotateY: 35, filter: "blur(1px)" }}
+                exit={{ x: "-60%", rotateY: 45, filter: "blur(2px)" }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
               >
                 <div className="relative">
                   {/* Conteúdo do popup anterior */}
@@ -546,15 +546,14 @@ export default function Carousel() {
                 key={`popup-center-${activePopup}`}
                 layoutId={activePopup}
                 className="w-[85%] max-w-lg bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto overflow-hidden relative z-[149] transform-gpu"
-                initial={{ opacity: 0.8, scale: 0.9 }}
+                initial={{ scale: 0.9 }}
                 animate={{ 
-                  opacity: 1, 
                   scale: 1, 
                   y: 0,
                   rotateX: [-2, 2, -2],
                   rotateY: [1, -1, 1]
                 }}
-                exit={{ opacity: 0.8, scale: 0.9 }}
+                exit={{ scale: 0.9 }}
                 transition={{ 
                   type: "spring", 
                   damping: 25, 
@@ -623,21 +622,19 @@ export default function Carousel() {
                   }}
                 />
                 
+                {/* Conteúdo do popup */}
                 <motion.div 
                   className="relative"
-                  initial={{ opacity: 0.8 }}
+                  initial={{ y: 0 }}
                   animate={{ 
-                    opacity: 1,
                     y: 0,
                     x: swipeDirection === "left" ? [0, 300] : swipeDirection === "right" ? [0, -300] : [0, -3, 0, 3, 0],
                   }}
                   transition={{ 
-                    delay: 0,
-                    opacity: { duration: 0.1 },
-                    duration: swipeDirection ? 0.2 : 0.4,
+                    duration: swipeDirection ? 0.4 : 0.4,
                     x: swipeDirection ? { 
-                      duration: 0.2,
-                      ease: "easeOut" 
+                      duration: 0.4,
+                      ease: "easeInOut" 
                     } : {
                       duration: 15,
                       repeat: Infinity,
@@ -702,10 +699,10 @@ export default function Carousel() {
                   navigateToNextIcon("right");
                 }}
                 whileHover={{ scale: 0.6, opacity: 0.7, filter: "blur(0px)" }}
-                initial={{ opacity: 0, x: "60%", rotateY: -45, filter: "blur(2px)" }}
-                animate={{ opacity: 0.5, x: "30%", rotateY: -35, filter: "blur(1px)" }}
-                exit={{ opacity: 0, x: "60%", rotateY: -45, filter: "blur(2px)" }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                initial={{ x: "60%", rotateY: -45, filter: "blur(2px)" }}
+                animate={{ x: "30%", rotateY: -35, filter: "blur(1px)" }}
+                exit={{ x: "60%", rotateY: -45, filter: "blur(2px)" }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
               >
                 <div className="relative">
                   {/* Conteúdo do popup seguinte */}
