@@ -421,7 +421,7 @@ export default function Carousel() {
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
                         {/* Ícone esquerdo para ILUMAi ONE */}
-                        <div className="absolute top-1/2 -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
+                        <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
@@ -468,7 +468,7 @@ export default function Carousel() {
                         </div>
 
                         {/* Ícone direito para ILUMAi ONE */}
-                        <div className="absolute top-1/2 -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
+                        <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
@@ -481,29 +481,27 @@ export default function Carousel() {
                       </>
                     ) : (
                       <>
-                        {/* Grupo de ícones à esquerda para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute top-1/2 -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center space-y-12 sm:space-y-16">
-                          <div className="flex flex-col items-center">
-                            <Image
-                              src="/IQOSILUMAV2/Icons/FlexPuff.svg"
-                              alt="Flex Puff"
-                              width={32}
-                              height={32}
-                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                            />
-                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
-                          </div>
+                        {/* Ícones à esquerda para ILUMAi e ILUMAi PRIME */}
+                        <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
+                          <Image
+                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
+                            alt="Flex Puff"
+                            width={32}
+                            height={32}
+                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                          />
+                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                        </div>
 
-                          <div className="flex flex-col items-center">
-                            <Image
-                              src="/IQOSILUMAV2/Icons/FlexBattery.svg"
-                              alt="Flex Battery"
-                              width={32}
-                              height={32}
-                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                            />
-                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
-                          </div>
+                        <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
+                          <Image
+                            src="/IQOSILUMAV2/Icons/FlexBattery.svg"
+                            alt="Flex Battery"
+                            width={32}
+                            height={32}
+                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                          />
+                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
                         </div>
 
                         {/* Imagem central do dispositivo */}
@@ -541,29 +539,27 @@ export default function Carousel() {
                           )}
                         </div>
 
-                        {/* Grupo de ícones à direita para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute top-1/2 -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center space-y-12 sm:space-y-16">
-                          <div className="flex flex-col items-center">
-                            <Image
-                              src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
-                              alt="Modo Pausa"
-                              width={32}
-                              height={32}
-                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                            />
-                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
-                          </div>
+                        {/* Ícones à direita para ILUMAi e ILUMAi PRIME */}
+                        <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
+                          <Image
+                            src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
+                            alt="Modo Pausa"
+                            width={32}
+                            height={32}
+                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                          />
+                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
+                        </div>
 
-                          <div className="flex flex-col items-center">
-                            <Image
-                              src="/IQOSILUMAV2/Icons/EcraTatil.svg"
-                              alt="Ecrã Tátil"
-                              width={32}
-                              height={32}
-                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                            />
-                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
-                          </div>
+                        <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
+                          <Image
+                            src="/IQOSILUMAV2/Icons/EcraTatil.svg"
+                            alt="Ecrã Tátil"
+                            width={32}
+                            height={32}
+                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                          />
+                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
                         </div>
                       </>
                     )}
