@@ -393,7 +393,6 @@ export default function Carousel() {
             <defs>
               <linearGradient id="snakeGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#5CD9E8" stopOpacity="1" />
-                <stop offset="70%" stopColor="#5CD9E8" stopOpacity="0.5" />
                 <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0" />
               </linearGradient>
               <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -402,35 +401,35 @@ export default function Carousel() {
               </filter>
             </defs>
             <rect 
-              x="calc(50% - 43%)"
-              y="calc(50% - 32%)"
-              width="86%"
-              height="64%"
-              rx="20" 
-              ry="20" 
+              x="calc(50% - 42%)"
+              y="calc(50% - 28%)"
+              width="84%"
+              height="56%"
+              rx="15" 
+              ry="15" 
               fill="none" 
               stroke="url(#snakeGradient3)" 
-              strokeWidth="4"
-              className="outer-snake-path"
+              strokeWidth="3"
+              className="continuous-snake-path"
               filter="url(#glow)"
             />
           </svg>
 
           <style jsx global>{`
-            @keyframes outerSnakeAnim {
+            @keyframes continuousSnakeAnim {
               0% {
-                stroke-dashoffset: 2000;
+                stroke-dashoffset: 1000;
               }
               100% {
                 stroke-dashoffset: 0;
               }
             }
 
-            .outer-snake-path {
-              stroke-dasharray: 40 160;
+            .continuous-snake-path {
+              stroke-dasharray: 1000;
               stroke-linecap: round;
-              animation: outerSnakeAnim 15s linear infinite;
-              filter: drop-shadow(0 0 10px #5CD9E8) drop-shadow(0 0 20px #5CD9E8);
+              animation: continuousSnakeAnim 8s linear infinite;
+              filter: drop-shadow(0 0 10px #5CD9E8);
             }
           `}</style>
 
