@@ -491,24 +491,24 @@ export default function Carousel() {
           `}</style>
           
           {/* Container do carrossel */}
-          <div className="relative flex items-center justify-center w-full">
+          <div className="relative flex items-center justify-center w-full perspective-[1200px]">
             {/* Popup anterior (esquerda) */}
             <motion.div
-              className="absolute left-4 w-[65%] max-w-md bg-gradient-to-br from-[#2D8F9B]/60 to-[#045557]/60 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-xl p-4 shadow-xl pointer-events-auto overflow-hidden origin-left scale-[0.6] opacity-60 -translate-x-[85%] z-[145]"
+              className="absolute left-[12%] w-[70%] max-w-md bg-gradient-to-br from-[#2D8F9B]/80 to-[#045557]/80 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-xl p-4 shadow-xl pointer-events-auto overflow-hidden origin-left scale-[0.75] opacity-80 z-[145] transform-gpu"
               onClick={(e) => {
                 e.stopPropagation();
                 navigateToNextIcon("left");
               }}
-              whileHover={{ scale: 0.65, opacity: 0.7 }}
-              initial={{ opacity: 0, x: "-100%" }}
-              animate={{ opacity: 0.6, x: "-85%" }}
-              exit={{ opacity: 0, x: "-100%" }}
+              whileHover={{ scale: 0.8, opacity: 0.9 }}
+              initial={{ opacity: 0, x: "-50%", rotateY: 45 }}
+              animate={{ opacity: 0.8, x: "-25%", rotateY: 25 }}
+              exit={{ opacity: 0, x: "-50%", rotateY: 45 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
               <div className="relative">
                 {/* Conteúdo do popup anterior */}
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/40">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/80 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/60">
                     <Image
                       src={prevPopupInfo.iconSrc}
                       alt={prevPopupInfo.title}
@@ -517,9 +517,9 @@ export default function Carousel() {
                       className="w-5 h-5 brightness-0 invert"
                     />
                   </div>
-                  <h3 className="text-lg font-iqos font-bold text-white/90">{prevPopupInfo.title}</h3>
+                  <h3 className="text-lg font-iqos font-bold text-white">{prevPopupInfo.title}</h3>
                 </div>
-                <div className="h-32 overflow-hidden text-xs text-white/80 font-iqos leading-relaxed bg-[#1A6A72]/10 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/10">
+                <div className="h-32 overflow-hidden text-xs text-white/90 font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/20">
                   {prevPopupInfo.content}
                 </div>
               </div>
@@ -527,7 +527,7 @@ export default function Carousel() {
 
             {/* Popup principal (centro) */}
             <motion.div
-              className="w-[85%] max-w-lg bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto overflow-hidden relative z-[149]"
+              className="w-[85%] max-w-lg bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto overflow-hidden relative z-[149] transform-gpu"
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ 
                 opacity: 1, 
@@ -672,21 +672,21 @@ export default function Carousel() {
             
             {/* Popup seguinte (direita) */}
             <motion.div
-              className="absolute right-4 w-[65%] max-w-md bg-gradient-to-br from-[#2D8F9B]/60 to-[#045557]/60 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-xl p-4 shadow-xl pointer-events-auto overflow-hidden origin-right scale-[0.6] opacity-60 translate-x-[85%] z-[145]"
+              className="absolute right-[12%] w-[70%] max-w-md bg-gradient-to-br from-[#2D8F9B]/80 to-[#045557]/80 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-xl p-4 shadow-xl pointer-events-auto overflow-hidden origin-right scale-[0.75] opacity-80 z-[145] transform-gpu"
               onClick={(e) => {
                 e.stopPropagation();
                 navigateToNextIcon("right");
               }}
-              whileHover={{ scale: 0.65, opacity: 0.7 }}
-              initial={{ opacity: 0, x: "100%" }}
-              animate={{ opacity: 0.6, x: "85%" }}
-              exit={{ opacity: 0, x: "100%" }}
+              whileHover={{ scale: 0.8, opacity: 0.9 }}
+              initial={{ opacity: 0, x: "50%", rotateY: -45 }}
+              animate={{ opacity: 0.8, x: "25%", rotateY: -25 }}
+              exit={{ opacity: 0, x: "50%", rotateY: -45 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
             >
               <div className="relative">
                 {/* Conteúdo do popup seguinte */}
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/40">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/80 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/60">
                     <Image
                       src={nextPopupInfo.iconSrc}
                       alt={nextPopupInfo.title}
@@ -695,9 +695,9 @@ export default function Carousel() {
                       className="w-5 h-5 brightness-0 invert"
                     />
                   </div>
-                  <h3 className="text-lg font-iqos font-bold text-white/90">{nextPopupInfo.title}</h3>
+                  <h3 className="text-lg font-iqos font-bold text-white">{nextPopupInfo.title}</h3>
                 </div>
-                <div className="h-32 overflow-hidden text-xs text-white/80 font-iqos leading-relaxed bg-[#1A6A72]/10 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/10">
+                <div className="h-32 overflow-hidden text-xs text-white/90 font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/20">
                   {nextPopupInfo.content}
                 </div>
               </div>
