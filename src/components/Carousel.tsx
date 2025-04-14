@@ -415,13 +415,13 @@ export default function Carousel() {
                     {formatModelName(selectedMachine?.baseModel || "")}
                   </h1>
 
-                  {/* Container principal com posicionamento relativo para os ícones */}
-                  <div className="relative w-full flex-1 flex items-center justify-center">
+                  {/* Container principal com posicionamento relativo para os ícones e padding lateral */}
+                  <div className="relative w-full flex-1 flex items-center justify-center px-6 sm:px-10 md:px-16">
                     {/* Ícones */}
                     {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
                       <>
                         {/* Ícone esquerdo para ILUMAi ONE */}
-                        <div className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div className="absolute left-[8%] sm:left-[12%] md:left-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/FlexPuff.svg"
                             alt="Flex Puff"
@@ -433,7 +433,7 @@ export default function Carousel() {
                         </div>
 
                         {/* Ícone direito para ILUMAi ONE */}
-                        <div className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div className="absolute right-[8%] sm:right-[12%] md:right-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center">
                           <Image
                             src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
                             alt="Início Automático"
@@ -447,7 +447,7 @@ export default function Carousel() {
                     ) : (
                       <>
                         {/* Grupo de ícones à esquerda para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center space-y-8 sm:space-y-12">
+                        <div className="absolute left-[8%] sm:left-[12%] md:left-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center space-y-12 sm:space-y-16">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/FlexPuff.svg"
@@ -472,7 +472,7 @@ export default function Carousel() {
                         </div>
 
                         {/* Grupo de ícones à direita para ILUMAi e ILUMAi PRIME */}
-                        <div className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 flex flex-col items-center space-y-8 sm:space-y-12">
+                        <div className="absolute right-[8%] sm:right-[12%] md:right-[15%] top-[45%] -translate-y-1/2 flex flex-col items-center space-y-12 sm:space-y-16">
                           <div className="flex flex-col items-center">
                             <Image
                               src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
@@ -499,7 +499,7 @@ export default function Carousel() {
                     )}
 
                     {/* Imagem central do dispositivo */}
-                    <div className="relative w-full flex-1 flex items-center justify-center -mt-65 sm:-mt-70 md:-mt-80">
+                    <div className="relative w-full flex-1 flex items-center justify-center -mt-20 sm:-mt-24 md:-mt-28">
                       {/* Botão "Ver em 3D" */}
                       {selectedMachine?.modelPath && (
                         <button
