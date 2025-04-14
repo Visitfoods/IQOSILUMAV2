@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback, MouseEvent } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeftIcon, ChevronRightIcon, CubeIcon } from "@heroicons/react/24/outline";
@@ -57,6 +57,7 @@ export default function Carousel() {
   const [selectedColor, setSelectedColor] = useState<ColorVariant>("Breeze");
   const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
   const [showModel3D, setShowModel3D] = useState(false);
+  const [activePopup, setActivePopup] = useState<string | null>(null);
   const pathname = usePathname();
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
@@ -255,6 +256,47 @@ export default function Carousel() {
     setShowModel3D(prev => !prev);
   };
 
+  // Função para lidar com cliques nos ícones
+  const handleIconClick = (iconName: string, event: MouseEvent) => {
+    event.stopPropagation(); // Evita propagação do clique
+    setActivePopup(activePopup === iconName ? null : iconName);
+  };
+
+  // Fechar popup quando clicar fora dele
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (activePopup) {
+        setActivePopup(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activePopup]);
+
+  // Componente de Popup
+  const IconPopup = ({ title, children, isOpen }: { title: string, children: React.ReactNode, isOpen: boolean }) => {
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="absolute z-50 w-72 sm:w-80 md:w-96 bg-black border border-white/20 rounded-xl backdrop-blur-md p-4"
+            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg sm:text-xl font-iqos font-bold text-white mb-2">{title}</h3>
+            <div className="text-sm sm:text-base text-white/90 font-iqos">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    );
+  };
+
   if (!isMounted) {
     return null;
   }
@@ -422,14 +464,27 @@ export default function Carousel() {
                       <>
                         {/* Ícone esquerdo para ILUMAi ONE */}
                         <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
-                            alt="Flex Puff"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("FlexPuffONE", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/FlexPuff.svg"
+                              alt="Flex Puff"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                            
+                            <div className="absolute top-1/2 left-full ml-4">
+                              <IconPopup title="Flex Puff" isOpen={activePopup === "FlexPuffONE"}>
+                                <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
 
                         {/* Imagem central do dispositivo */}
@@ -469,39 +524,81 @@ export default function Carousel() {
 
                         {/* Ícone direito para ILUMAi ONE */}
                         <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
-                            alt="Início Automático"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Início Automático</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("InicioAutomatico", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/InicioAutomatico.svg"
+                              alt="Início Automático"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Início Automático</span>
+                            
+                            <div className="absolute top-1/2 right-full mr-4">
+                              <IconPopup title="Início Automático" isOpen={activePopup === "InicioAutomatico"}>
+                                <p>O ILUMAi ONE permite iniciar a utilização automaticamente ao inspirar, sem necessidade de premir botões.</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
                       </>
                     ) : (
                       <>
                         {/* Ícones à esquerda para ILUMAi e ILUMAi PRIME */}
                         <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/FlexPuff.svg"
-                            alt="Flex Puff"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("FlexPuff", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/FlexPuff.svg"
+                              alt="Flex Puff"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Puff</span>
+                            
+                            <div className="absolute top-1/2 left-full ml-4">
+                              <IconPopup title="Flex Puff" isOpen={activePopup === "FlexPuff"}>
+                                <p>A funcionalidade Flexpuff adapta-se de forma inteligente ao ritmo de utilização, podendo permitir até 4 aspirações extra, para uma experiência de utilização máxima de até 6 minutos*.</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
 
                         <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 left-6 sm:left-12 md:left-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/FlexBattery.svg"
-                            alt="Flex Battery"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("FlexBattery", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/FlexBattery.svg"
+                              alt="Flex Battery"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Flex Battery</span>
+                            
+                            <div className="absolute top-1/2 left-full ml-4">
+                              <IconPopup title="Flex Battery" isOpen={activePopup === "FlexBattery"}>
+                                <p>Já é possível adaptar a bateria do seu dispositivo com o FlexBattery:</p>
+                                <p className="mt-2"><span className="font-bold">Modo Eco</span><br/>Permite prolongar o tempo de vida útil da bateria do equipamento até um ano**;</p>
+                                <p className="mt-2">ou</p>
+                                <p className="mt-2"><span className="font-bold">Modo Desempenho</span><br/>Até 3 utilizações consecutivas**</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
 
                         {/* Imagem central do dispositivo */}
@@ -541,25 +638,52 @@ export default function Carousel() {
 
                         {/* Ícones à direita para ILUMAi e ILUMAi PRIME */}
                         <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
-                            alt="Modo Pausa"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("ModoPausa", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/Modo Pausa.svg"
+                              alt="Modo Pausa"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Modo Pausa</span>
+                            
+                            <div className="absolute top-1/2 right-full mr-4">
+                              <IconPopup title="Modo Pausa" isOpen={activePopup === "ModoPausa"}>
+                                <p>Já é possível interromper e recomeçar a utilização até 8 minutos, sem que o SMARTCORE STICK™ fique inutilizado, com o novo Modo Pausa.</p>
+                                <p className="mt-2 text-white/70 italic">Apenas disponível no Modo Desempenho</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
 
                         <div className="absolute top-[calc(50%+50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
-                          <Image
-                            src="/IQOSILUMAV2/Icons/EcraTatil.svg"
-                            alt="Ecrã Tátil"
-                            width={32}
-                            height={32}
-                            className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                          />
-                          <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="relative cursor-pointer"
+                            onClick={(e) => handleIconClick("EcraTatil", e)}
+                          >
+                            <Image
+                              src="/IQOSILUMAV2/Icons/EcraTatil.svg"
+                              alt="Ecrã Tátil"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                            />
+                            <span className="mt-3 text-[10px] sm:text-xs md:text-sm text-white/80 font-iqos text-center">Ecrã Tátil</span>
+                            
+                            <div className="absolute top-1/2 right-full mr-4">
+                              <IconPopup title="Ecrã Tátil" isOpen={activePopup === "EcraTatil"}>
+                                <p>O novo Ecrã Tátil permite acompanhar todas as informações relativas ao estado do dispositivo e personalizar a sua utilização.</p>
+                              </IconPopup>
+                            </div>
+                          </motion.div>
                         </div>
                       </>
                     )}
