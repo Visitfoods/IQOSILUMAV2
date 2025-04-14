@@ -388,7 +388,7 @@ export default function Carousel() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Efeito "snake" flutuante - tamanho ajustado */}
+          {/* Efeito "snake" flutuante - ajustado com margem de 3% em relação ao popup */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-[140]" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="snakeGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -400,11 +400,12 @@ export default function Carousel() {
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
+            {/* O popup tem 85% de largura, adicionamos 3% em cada lado para o snake (91% total) */}
             <rect 
-              x="calc(50% - 40%)"
-              y="calc(50% - 7.5%)"
-              width="80%"
-              height="15%"
+              x="calc(50% - 45.5%)"
+              y="calc(50% - 22%)"
+              width="91%"
+              height="44%"
               rx="10" 
               ry="10" 
               fill="none" 
