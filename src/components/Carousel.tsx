@@ -458,38 +458,52 @@
         return { title, content, iconSrc };
       };
 
+      // Lidar com o fim do arrasto
+      const handleDragEnd = (e: any, info: any) => {
+        setIsDragging(false);
+        const offset = info.offset.x;
+        const velocity = info.velocity.x;
+        
+        // Mudar card se o swipe foi rápido OU se passou do threshold
+        const shouldSwipe = Math.abs(velocity) > 500 || Math.abs(offset) > swipeThreshold;
+        
+        if (shouldSwipe) {
+          const direction = offset > 0 ? "prev" : "next";
+          const newIndex = direction === "prev" 
+            ? (activeIndex - 1 + totalCards) % totalCards
+            : (activeIndex + 1) % totalCards;
+
+          // Atualizar o card ativo
+          const newActiveIcon = availableIcons[newIndex];
+          setActivePopup(newActiveIcon);
+          setActiveIconRef(iconRefs.current[newActiveIcon]);
+          setCurrentOffset(0);
+        } else {
+          // Retornar ao centro se o swipe não foi suficiente
+          setCurrentOffset(0);
+        }
+      };
+
       // Navegar para o popup anterior
       const navigatePrev = () => {
         if (isDragging) return;
+        
         const newIndex = (activeIndex - 1 + totalCards) % totalCards;
-        setActivePopup(availableIcons[newIndex]);
+        const newActiveIcon = availableIcons[newIndex];
+        setActivePopup(newActiveIcon);
+        setActiveIconRef(iconRefs.current[newActiveIcon]);
         setCurrentOffset(0);
-        setActiveIconRef(iconRefs.current[availableIcons[newIndex]]);
       };
 
       // Navegar para o próximo popup
       const navigateNext = () => {
         if (isDragging) return;
-        const newIndex = (activeIndex + 1) % totalCards;
-        setActivePopup(availableIcons[newIndex]);
-        setCurrentOffset(0);
-        setActiveIconRef(iconRefs.current[availableIcons[newIndex]]);
-      };
-      
-      // Lidar com o fim do arrasto
-      const handleDragEnd = (e: any, info: any) => {
-        setIsDragging(false);
-        const offset = info.offset.x;
         
-        if (Math.abs(offset) > swipeThreshold) {
-          if (offset > 0) {
-            navigatePrev();
-          } else {
-            navigateNext();
-          }
-        } else {
-          setCurrentOffset(0);
-        }
+        const newIndex = (activeIndex + 1) % totalCards;
+        const newActiveIcon = availableIcons[newIndex];
+        setActivePopup(newActiveIcon);
+        setActiveIconRef(iconRefs.current[newActiveIcon]);
+        setCurrentOffset(0);
       };
       
       // Renderizar o conteúdo de um popup
@@ -594,7 +608,7 @@
             <motion.div
               key={`popup-card-${iconName}-${activeIndex}`}
               className="absolute"
-              layout
+              layout="position"
               style={{
                 x: xPosition,
                 scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
@@ -615,10 +629,12 @@
                 stiffness: 400,
                 damping: 30,
                 bounce: 0.1,
+                restDelta: 0.01
               }}
               drag={isCurrent ? "x" : false}
               dragConstraints={{ left: -cardWidth, right: cardWidth }}
               dragElastic={0.2}
+              dragSnapToOrigin={false}
               onDragStart={() => setIsDragging(true)}
               onDrag={(e, info) => {
                 if (isCurrent) {
