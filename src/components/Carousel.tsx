@@ -602,14 +602,14 @@ export default function Carousel() {
         return (
           <motion.div
             key={`popup-card-${iconName}`}
-            className="absolute top-0 left-1/2"
+            className="absolute"
             style={{ 
-              x: xPosition,
+              left: `calc(50% + ${xPosition}px)`,
+              transform: `translateX(-50%) scale(${scale})`,
               scale: scale,
               opacity: opacity,
               filter: `blur(${blur}px)`,
               zIndex: zIndex,
-              transform: `translateX(-50%) translateX(${xPosition}px) scale(${scale})`,
               pointerEvents: isCurrent ? 'auto' : 'none'
             }}
             transition={{ 
@@ -653,7 +653,7 @@ export default function Carousel() {
         />
 
         <div className="fixed inset-0 flex items-center justify-center z-[150]" onClick={(e) => e.stopPropagation()}>
-          <div className="relative w-full max-w-4xl h-[70vh] sm:h-[60vh] md:h-[50vh]">
+          <div className="relative w-full h-[70vh] sm:h-[60vh] md:h-[50vh]">
             <div className="relative w-full h-full flex items-center justify-center">
               <div className="relative w-full h-full flex items-center justify-center">
                 
