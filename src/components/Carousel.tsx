@@ -13,6 +13,7 @@
     image: string;
     baseModel: string;
     modelPath?: string;
+    modelPaths?: Record<string, string>;
   }
 
   type ColorVariant = "Breeze" | "Midnight" | "Leaf" | "Terracotta" | "Violet";
@@ -29,7 +30,15 @@
       id: 2, 
       name: "ILUMAi ONE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", 
-      baseModel: "ILUMAi-ONE" 
+      baseModel: "ILUMAi-ONE",
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+      modelPaths: {
+        Breeze: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+        Midnight: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
+        Leaf: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
+        Terracotta: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
+        Violet: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
+      }
     },
     { 
       id: 3, 
@@ -290,9 +299,11 @@
     const positionedMachines = getPositionedMachines();
 
     // Função para obter o caminho do modelo 3D
-    const getModelPath = (machine: Machine) => {
-      if (!machine.modelPath) return null;
-      return `${basePath}${machine.modelPath}`;
+    const getModelPath = (machine: Machine, colorVariant?: ColorVariant) => {
+      if (machine.baseModel === "ILUMAi-ONE") {
+        return machine.modelPaths?.[colorVariant || selectedColor] || machine.modelPath;
+      }
+      return machine.modelPath || null;
     };
 
     // Alternar entre imagem 2D e modelo 3D
@@ -975,37 +986,14 @@
 
                           {/* Imagem central do dispositivo */}
                           <div className="relative flex items-center justify-center">
-                            {/* Botão "Ver em 3D" */}
-                            {selectedMachine?.modelPath && (
-                              <button
-                                onClick={toggleModelView}
-                                className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
-                                aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
-                              >
-                                <CubeIcon className="w-5 h-5" />
-                                <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
-                              </button>
-                            )}
-                            
-                            {showModel3D && selectedMachine?.modelPath ? (
-                              <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
-                                <ModelViewer3D 
-                                  modelPath={getModelPath(selectedMachine) || ""}
-                                  scale={7}
-                                  position={[0, 0, 0]}
-                                  autoRotate={true}
-                                />
-                              </div>
-                            ) : (
-                              <Image
-                                src={getImagePath(selectedMachine!, selectedColor)}
-                                alt={selectedMachine?.name || ""}
-                                width={400}
-                                height={400}
-                                className="w-32 sm:w-45 md:w-50 h-auto object-contain"
-                                priority
+                            <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
+                              <ModelViewer3D 
+                                modelPath={getModelPath(selectedMachine, selectedColor) || ""}
+                                scale={7}
+                                position={[0, 0, 0]}
+                                autoRotate={true}
                               />
-                            )}
+                            </div>
                           </div>
 
                           {/* Ícone direito para ILUMAi ONE */}
