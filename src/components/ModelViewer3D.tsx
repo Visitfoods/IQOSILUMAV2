@@ -14,7 +14,7 @@ interface ModelViewerProps {
   onError?: () => void;
 }
 
-function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelViewerProps) {
+function Model({ modelPath, scale = 3, position = [0, 0, 0], onError }: ModelViewerProps) {
   const [hasError, setHasError] = useState(false);
 
   // Hook sempre chamado incondicionalmente
@@ -77,7 +77,7 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
   }
 }
 
-export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 0], autoRotate = false, onError }: ModelViewerProps) {
+export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError }: ModelViewerProps) {
   const controlsRef = useRef(null);
 
   // Precarregar o modelo
