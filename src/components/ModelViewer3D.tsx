@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF } from '@react-three/drei';
+import { OrbitControls, useGLTF, Environment, Stage, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface ModelViewerProps {
@@ -33,11 +33,19 @@ function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelVie
   if (!scene) return null;
   
   return (
-    <primitive 
-      object={scene} 
-      scale={scale} 
-      position={position} 
-    />
+    <Stage
+      preset="soft"
+      intensity={0.6}
+      environment="city"
+      shadows={false}
+      adjustCamera={false}
+    >
+      <primitive 
+        object={scene} 
+        scale={scale} 
+        position={position} 
+      />
+    </Stage>
   );
 }
 
@@ -89,11 +97,18 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
     <Canvas
       style={{ width: '100%', height: '100%' }}
       camera={{ position: [0, 0, 10], fov: 50 }}
-      shadows
+      shadows={false}
+      gl={{ 
+        antialias: true,
+        alpha: true,
+      }}
     >
-      <ambientLight intensity={0.5} />
-      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} />
+      <color attach="background" args={['#ffffff']} />
+      <fog attach="fog" args={['#ffffff', 40, 60]} />
+      
+      {/* Iluminação uniforme e suave */}
+      <ambientLight intensity={1.5} />
+      <hemisphereLight intensity={0.8} color="#ffffff" groundColor="#bbbbff" />
       
       <ErrorBoundary onError={onError}>
         <Model 
@@ -113,6 +128,8 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         minDistance={5}
         maxDistance={20}
       />
+      
+      <Environment preset="city" background={false} />
     </Canvas>
   );
 } 
