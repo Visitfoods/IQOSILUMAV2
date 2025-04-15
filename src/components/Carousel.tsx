@@ -313,9 +313,9 @@
       // Se não houver modelPath, retorna null
       if (!modelPath) return null;
 
-      // Garantir que o caminho comece com /IQOSILUMAV2
-      if (!modelPath.startsWith('/IQOSILUMAV2')) {
-        modelPath = `/IQOSILUMAV2${modelPath}`;
+      // Teste direto - remove o prefixo /IQOSILUMAV2 no GitHub Pages
+      if (modelPath.startsWith('/IQOSILUMAV2/')) {
+        modelPath = modelPath.replace('/IQOSILUMAV2/', '/');
       }
 
       console.log("Caminho do modelo 3D:", modelPath);
