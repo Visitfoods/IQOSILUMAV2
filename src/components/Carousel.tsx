@@ -611,29 +611,36 @@
               layout="position"
               style={{
                 x: xPosition,
-                scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
-                opacity: isCurrent ? 1 : Math.max(0.6, 1 - (distance / cardWidth * 0.3)),
-                filter: `blur(${isCurrent ? 0 : Math.min(5, distance / cardWidth * 2)}px)`,
+                scale: isCurrent ? 1 : Math.max(0.8, 1 - (distance / cardWidth * 0.15)),
+                opacity: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
+                filter: `blur(${isCurrent ? 0 : Math.min(3, distance / cardWidth * 1.5)}px)`,
                 zIndex: isCurrent ? 100 : 100 - Math.abs(positionOffset) * 10,
                 pointerEvents: isCurrent ? 'auto' : 'none',
               }}
               animate={{
                 x: xPosition,
-                scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
-                opacity: isCurrent ? 1 : Math.max(0.6, 1 - (distance / cardWidth * 0.3)),
-                filter: `blur(${isCurrent ? 0 : Math.min(5, distance / cardWidth * 2)}px)`,
+                scale: isCurrent ? 1 : Math.max(0.8, 1 - (distance / cardWidth * 0.15)),
+                opacity: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
+                filter: `blur(${isCurrent ? 0 : Math.min(3, distance / cardWidth * 1.5)}px)`,
                 zIndex: isCurrent ? 100 : 100 - Math.abs(positionOffset) * 10,
               }}
               transition={{
                 type: "spring",
-                stiffness: 400,
-                damping: 30,
-                bounce: 0.1,
-                restDelta: 0.01
+                stiffness: 280,
+                damping: 25,
+                mass: 0.5,
+                bounce: 0.2,
+                restDelta: 0.001,
+                restSpeed: 0.001,
+                duration: 0.6
               }}
               drag={isCurrent ? "x" : false}
               dragConstraints={{ left: -cardWidth, right: cardWidth }}
-              dragElastic={0.2}
+              dragElastic={0.1}
+              dragTransition={{ 
+                bounceStiffness: 300,
+                bounceDamping: 20
+              }}
               dragSnapToOrigin={false}
               onDragStart={() => setIsDragging(true)}
               onDrag={(e, info) => {
