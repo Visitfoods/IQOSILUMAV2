@@ -17,13 +17,17 @@ interface ModelViewerProps {
 
 function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: ModelViewerProps) {
   const [hasError, setHasError] = useState(false);
+  const gltf = useGLTF(modelPath);
 
-  // Hook sempre chamado incondicionalmente
+  useEffect(() => {
+    if (gltf && gltf.scene && onLoad) {
+      onLoad();
+    }
+  }, [gltf, onLoad]);
+
   let scene;
   try {
-    const gltf = useGLTF(modelPath, true, undefined, onLoad);
     scene = gltf.scene;
-    if (onLoad) onLoad();
   } catch (error) {
     console.error("Erro ao carregar modelo:", error);
     if (!hasError) {
