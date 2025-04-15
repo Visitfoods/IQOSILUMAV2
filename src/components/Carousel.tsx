@@ -473,6 +473,23 @@ export default function Carousel() {
                 {title}
               </h3>
             </div>
+            
+            {isActive && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActivePopup(null);
+                  setActiveIconRef(null);
+                }}
+                className="absolute top-0 right-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1A6A72]/60 backdrop-blur-md hover:bg-[#1A6A72] transition-colors border border-[#5CD9E8]/30"
+                aria-label="Fechar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            
             <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">
               {content}
             </div>
