@@ -228,10 +228,10 @@ export default function Carousel() {
       scale: 0.8,
       filter: "blur(4px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.2 },
-        scale: { duration: 0.4 },
-        filter: { duration: 0.4 }
+        x: { type: "spring", stiffness: 400, damping: 35 },
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.5 },
+        filter: { duration: 0.5 }
       }
     }),
     center: {
@@ -241,36 +241,36 @@ export default function Carousel() {
       zIndex: 10,
       filter: "blur(0px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.4 },
-        scale: { duration: 0.4 },
-        filter: { duration: 0.4 }
+        x: { type: "spring", stiffness: 400, damping: 35 },
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.5 },
+        filter: { duration: 0.5 }
       }
     },
     left: {
-      x: "-30%",
-      opacity: 0.7,
+      x: "-35%",
+      opacity: 0.6,
       scale: 0.85,
       zIndex: 5,
       filter: "blur(2px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.4 },
-        scale: { duration: 0.4 },
-        filter: { duration: 0.4 }
+        x: { type: "spring", stiffness: 400, damping: 35 },
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.5 },
+        filter: { duration: 0.5 }
       }
     },
     right: {
-      x: "30%",
-      opacity: 0.7,
+      x: "35%",
+      opacity: 0.6,
       scale: 0.85,
       zIndex: 5,
       filter: "blur(2px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.4 },
-        scale: { duration: 0.4 },
-        filter: { duration: 0.4 }
+        x: { type: "spring", stiffness: 400, damping: 35 },
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.5 },
+        filter: { duration: 0.5 }
       }
     },
     exit: (direction: "left" | "right") => ({
@@ -279,10 +279,10 @@ export default function Carousel() {
       scale: 0.8,
       filter: "blur(4px)",
       transition: {
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.2 },
-        scale: { duration: 0.4 },
-        filter: { duration: 0.4 }
+        x: { type: "spring", stiffness: 400, damping: 35 },
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.5 },
+        filter: { duration: 0.5 }
       }
     })
   };
@@ -393,6 +393,7 @@ export default function Carousel() {
     // Estados para controlar a posição e animação fluida
     const [currentOffset, setCurrentOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
+    const [animationVariant, setAnimationVariant] = useState<"slide" | "fade" | "scale" | "flip">("slide");
     
     // Não renderizar nada se não houver popup ativo
     if (!activePopup || !activeIconRef) return null;
@@ -458,6 +459,14 @@ export default function Carousel() {
       return { title, content, iconSrc };
     };
 
+    // Alternar entre variantes de animação
+    const cycleAnimationVariant = () => {
+      const variants: Array<"slide" | "fade" | "scale" | "flip"> = ["slide", "fade", "scale", "flip"];
+      const currentIndex = variants.indexOf(animationVariant);
+      const nextIndex = (currentIndex + 1) % variants.length;
+      setAnimationVariant(variants[nextIndex]);
+    };
+
     // Navegar para o popup anterior
     const navigatePrev = () => {
       if (isDragging) return;
@@ -491,6 +500,42 @@ export default function Carousel() {
       } else {
         // Retornar ao centro se o swipe não foi completado
         setCurrentOffset(0);
+      }
+    };
+    
+    // Obter as propriedades de animação com base na variante selecionada
+    const getAnimationProps = (xPosition: number, distance: number, isCurrent: boolean) => {
+      const baseProps = {
+        x: xPosition,
+        scale: Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
+        opacity: Math.max(0.6, 1 - (distance / cardWidth * 0.3)),
+        filter: `blur(${Math.min(5, distance / cardWidth * 2)}px)`,
+        zIndex: 100 - Math.abs(distance / cardWidth) * 10,
+      };
+      
+      switch (animationVariant) {
+        case "fade":
+          return {
+            ...baseProps,
+            opacity: isCurrent ? 1 : Math.max(0.3, 1 - (distance / cardWidth * 0.6)),
+            filter: `blur(${Math.min(8, distance / cardWidth * 3)}px)`,
+            scale: isCurrent ? 1 : Math.max(0.5, 1 - (distance / cardWidth * 0.3)),
+          };
+        case "scale":
+          return {
+            ...baseProps,
+            scale: isCurrent ? 1 : Math.max(0.4, 1 - (distance / cardWidth * 0.4)),
+            opacity: isCurrent ? 1 : Math.max(0.5, 1 - (distance / cardWidth * 0.2)),
+            y: isCurrent ? 0 : Math.min(40, distance / cardWidth * 30),
+          };
+        case "flip":
+          return {
+            ...baseProps,
+            rotateY: isCurrent ? 0 : Math.min(45, (distance / cardWidth) * 30) * (xPosition < 0 ? -1 : 1),
+            z: isCurrent ? 0 : -200,
+          };
+        default: // "slide"
+          return baseProps;
       }
     };
     
@@ -590,24 +635,14 @@ export default function Carousel() {
         
         // Calcular propriedades visuais baseadas na distância do centro
         const distance = Math.abs(xPosition);
-        const scale = Math.max(0.7, 1 - (distance / cardWidth * 0.2));
-        const opacity = Math.max(0.6, 1 - (distance / cardWidth * 0.3));
-        const blur = Math.min(5, distance / cardWidth * 2);
-        const zIndex = 100 - Math.abs(adjustedPosition) * 10;
         const isCurrent = index === activeIndex;
+        const animProps = getAnimationProps(xPosition, distance, isCurrent);
         
         return (
           <motion.div
             key={`popup-card-${iconName}`}
             className="absolute"
-            style={{ 
-              x: xPosition,
-              scale: scale,
-              opacity: opacity,
-              filter: `blur(${blur}px)`,
-              zIndex: zIndex,
-              pointerEvents: isCurrent ? 'auto' : 'none'
-            }}
+            style={animProps}
             transition={{ 
               type: "spring", 
               stiffness: isDragging ? 1000 : 300, 
@@ -658,6 +693,14 @@ export default function Carousel() {
               >
                 {renderCards()}
               </motion.div>
+
+              {/* Botão para alternar efeitos de animação */}
+              <button 
+                onClick={cycleAnimationVariant}
+                className="absolute bottom-4 left-4 text-white bg-[#1A6A72]/60 hover:bg-[#1A6A72] backdrop-blur-md px-3 py-1 text-xs rounded-full transition-colors border border-[#5CD9E8]/30 z-[160]"
+              >
+                Efeito: {animationVariant}
+              </button>
 
               {/* Áreas para cliques de navegação */}
               <button 
