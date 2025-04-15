@@ -36,8 +36,8 @@ function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelVie
   return (
     <Stage
       preset="soft"
-      intensity={1.8}
-      environment="studio"
+      intensity={2.5}
+      environment="city"
       shadows={false}
       adjustCamera={false}
     >
@@ -103,21 +103,26 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         antialias: true,
         alpha: true,
         toneMapping: ACESFilmicToneMapping,
-        toneMappingExposure: 1.5
+        toneMappingExposure: 2.0
       }}
       onCreated={({ gl }) => {
         gl.toneMapping = ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.5;
+        gl.toneMappingExposure = 2.0;
       }}
     >
       <color attach="background" args={['#ffffff']} />
       <fog attach="fog" args={['#ffffff', 50, 70]} />
       
       {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
-      <ambientLight intensity={3.0} />
-      <hemisphereLight intensity={3.0} color="#ffffff" groundColor="#e0e0ff" />
+      <ambientLight intensity={5.0} />
+      <hemisphereLight intensity={4.0} color="#ffffff" groundColor="#e0e0ff" />
       <directionalLight 
         position={[5, 10, 5]} 
+        intensity={1.5} 
+        castShadow={false} 
+      />
+      <directionalLight 
+        position={[-5, 5, -5]} 
         intensity={1.0} 
         castShadow={false} 
       />
@@ -143,7 +148,7 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         maxDistance={20}
       />
       
-      <Environment preset="studio" background={false} />
+      <Environment preset="city" background={false} />
     </Canvas>
   );
 } 
