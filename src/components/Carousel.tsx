@@ -739,7 +739,7 @@ export default function Carousel() {
             </div>
 
             {/* Carrossel de ícones abaixo do popup principal */}
-            <div className="absolute bottom-0 left-0 right-0 -mb-16 flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
+            <div className="absolute left-0 right-0 bottom-[-3rem] sm:bottom-[-4rem] md:bottom-[-5rem] flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
               {availableIcons.map((iconName, index) => {
                 const isActive = iconName === activePopup;
                 const { src, label } = getIconInfo(iconName);
