@@ -390,9 +390,11 @@ export default function Carousel() {
 
   // Componente GlobalPopup para renderizar o popup fora dos containers dos ícones
   const GlobalPopup = () => {
-    // Estados para controlar o carrossel
+    // Estados para controlar o carrossel com animação fluida
     const [popupDirection, setPopupDirection] = useState<"left" | "right" | null>(null);
     const [isPopupAnimating, setIsPopupAnimating] = useState(false);
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     
     // Não renderizar nada se não houver popup ativo
     if (!activePopup || !activeIconRef) return null;
@@ -400,6 +402,10 @@ export default function Carousel() {
     // Definir todos os ícones disponíveis para o carrossel
     const availableIcons = selectedMachine ? getAvailableIcons(selectedMachine.baseModel) : [];
     const activeIndex = availableIcons.findIndex(icon => icon === activePopup);
+    
+    // Configurações para a animação fluida
+    const cardWidth = 300; // Largura base do cartão
+    const swipeThreshold = 100; // Limiar para completar um swipe
     
     // Obter informações dos popups
     const getPopupContent = (iconName: string) => {
@@ -453,7 +459,7 @@ export default function Carousel() {
       return { title, content, iconSrc };
     };
 
-    // Função para obter popups posicionados (similar ao getPositionedMachines do carrossel principal)
+    // Função para obter popups posicionados 
     const getPositionedPopups = () => {
       const totalPopups = availableIcons.length;
       return availableIcons.map((iconName, index) => {
@@ -494,77 +500,24 @@ export default function Carousel() {
       }, 500);
     };
 
-    // Variantes de animação para os popups (similar aos variants do carrossel principal)
-    const popupVariants = {
-      enter: (direction: "left" | "right") => ({
-        x: direction === "right" ? "100%" : "-100%",
-        opacity: 0,
-        scale: 0.8,
-        filter: "blur(4px)",
-        transition: {
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.2 },
-          scale: { duration: 0.4 },
-          filter: { duration: 0.4 }
-        }
-      }),
-      center: {
-        x: 0,
-        opacity: 1,
-        scale: 1,
-        zIndex: 10,
-        filter: "blur(0px)",
-        transition: {
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.4 },
-          scale: { duration: 0.4 },
-          filter: { duration: 0.4 }
-        }
-      },
-      left: {
-        x: "-30%",
-        opacity: 0.7,
-        scale: 0.85,
-        zIndex: 5,
-        filter: "blur(2px)",
-        transition: {
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.4 },
-          scale: { duration: 0.4 },
-          filter: { duration: 0.4 }
-        }
-      },
-      right: {
-        x: "30%",
-        opacity: 0.7,
-        scale: 0.85,
-        zIndex: 5,
-        filter: "blur(2px)",
-        transition: {
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.4 },
-          scale: { duration: 0.4 },
-          filter: { duration: 0.4 }
-        }
-      },
-      exit: (direction: "left" | "right") => ({
-        x: direction === "right" ? "-100%" : "100%",
-        opacity: 0,
-        scale: 0.8,
-        filter: "blur(4px)",
-        transition: {
-          x: { type: "spring", stiffness: 300, damping: 30 },
-          opacity: { duration: 0.2 },
-          scale: { duration: 0.4 },
-          filter: { duration: 0.4 }
-        }
-      })
+    // Calcular posição para animação fluida
+    const calculatePosition = (position: string, offset: number = 0) => {
+      switch (position) {
+        case "center":
+          return offset;
+        case "left":
+          return -cardWidth + offset;
+        case "right":
+          return cardWidth + offset;
+        default:
+          return 0;
+      }
     };
-
+    
     // Obter popups posicionados
     const positionedPopups = getPositionedPopups();
     
-    // Conteúdo de um popup
+    // Renderizar o conteúdo de um popup
     const renderPopupContent = (iconName: string) => {
       const { title, content, iconSrc } = getPopupContent(iconName);
       
@@ -643,6 +596,26 @@ export default function Carousel() {
       );
     };
     
+    // Atualizar o popup ativo após o swipe bem-sucedido
+    const handleDragEnd = (e: any, info: any) => {
+      setIsDragging(false);
+      const offset = info.offset.x;
+      
+      // Se o arrasto ultrapassou o limiar, mudar para o próximo/anterior
+      if (Math.abs(offset) > swipeThreshold) {
+        const direction = offset > 0 ? "left" : "right";
+        const newIndex = direction === "right"
+          ? (activeIndex + 1) % availableIcons.length
+          : (activeIndex - 1 + availableIcons.length) % availableIcons.length;
+        
+        setPopupDirection(direction);
+        setActivePopup(availableIcons[newIndex]);
+      }
+      
+      // Resetar o offset após completar/cancelar o arrasto
+      setDragOffset(0);
+    };
+    
     return (
       <>
         <motion.div 
@@ -665,101 +638,69 @@ export default function Carousel() {
                   className="absolute inset-0 z-[5]"
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onDragEnd={(e, { offset, velocity }) => {
-                    if (isPopupAnimating) return;
-                    
-                    const swipe = offset.x;
-                    
-                    if (Math.abs(swipe) > 50) {
-                      if (swipe < 0) {
-                        handlePopupNav("right");
-                      } else {
-                        handlePopupNav("left");
-                      }
-                    }
+                  dragElastic={0.3}
+                  onDrag={(e, info) => {
+                    setIsDragging(true);
+                    setDragOffset(info.offset.x);
                   }}
+                  onDragEnd={handleDragEnd}
                 />
-                
+
+                {/* Área para cliques de navegação */}
                 <button 
-                  className="absolute left-0 top-0 bottom-0 w-1/3 h-auto z-[15] bg-transparent focus:outline-none"
+                  className="absolute left-0 top-0 bottom-0 w-1/4 h-auto z-[15] bg-transparent focus:outline-none"
                   onClick={() => !isPopupAnimating && handlePopupNav("left")}
                   disabled={isPopupAnimating}
                   aria-label="Popup anterior"
                 />
                 
                 <button 
-                  className="absolute right-0 top-0 bottom-0 w-1/3 h-auto z-[15] bg-transparent focus:outline-none"
+                  className="absolute right-0 top-0 bottom-0 w-1/4 h-auto z-[15] bg-transparent focus:outline-none"
                   onClick={() => !isPopupAnimating && handlePopupNav("right")}
                   disabled={isPopupAnimating}
                   aria-label="Próximo popup"
                 />
 
-                <AnimatePresence mode="sync" initial={false} custom={popupDirection}>
+                {/* Container central do carrossel */}
+                <div className="relative flex justify-center items-center w-full h-full">
                   {positionedPopups.map((popup) => (
                     <motion.div
                       key={popup.iconName}
-                      className="absolute inset-0 flex items-center justify-center"
-                      custom={popupDirection}
-                      initial="enter"
-                      animate={popup.position}
-                      exit="exit"
-                      variants={popupVariants}
+                      className="absolute flex items-center justify-center w-full max-w-lg"
                       style={{ 
-                        zIndex: popup.position === "center" ? 10 : 1,
-                        pointerEvents: popup.position === "center" ? "auto" : "none"
+                        x: calculatePosition(popup.position, dragOffset),
+                        scale: popup.position === "center" ? 1 : 0.85,
+                        opacity: popup.position === "center" ? 1 : 0.7,
+                        filter: popup.position === "center" ? "blur(0px)" : "blur(2px)",
+                        zIndex: popup.position === "center" ? 10 : 5,
+                        pointerEvents: popup.position === "center" ? "auto" : "none",
                       }}
-                      drag="x"
+                      transition={{ 
+                        type: "spring",
+                        stiffness: isDragging ? 1000 : 300,
+                        damping: isDragging ? 100 : 30,
+                        mass: 0.8,
+                        velocity: isDragging ? 0 : 5
+                      }}
+                      drag={popup.position === "center" ? "x" : false}
                       dragConstraints={{ left: 0, right: 0 }}
                       dragElastic={0.2}
-                      onDragEnd={(e, { offset }) => {
-                        if (isPopupAnimating) return;
-                        
-                        const swipe = offset.x;
-                        
-                        if (Math.abs(swipe) > 50) {
-                          if (swipe < 0) {
-                            handlePopupNav("right");
-                          } else {
-                            handlePopupNav("left");
-                          }
+                      onDrag={(e, info) => {
+                        if (popup.position === "center") {
+                          setIsDragging(true);
+                          setDragOffset(info.offset.x);
+                        }
+                      }}
+                      onDragEnd={(e, info) => {
+                        if (popup.position === "center") {
+                          handleDragEnd(e, info);
                         }
                       }}
                     >
-                      {popup.position === "center" && (
-                        <motion.div 
-                          className="flex items-center justify-center w-full max-w-lg mx-auto"
-                          initial={{ scale: 0.95, opacity: 0.8 }}
-                          animate={{ 
-                            scale: 1,
-                            opacity: 1,
-                            transition: {
-                              type: "spring",
-                              stiffness: 300,
-                              damping: 25
-                            }
-                          }}
-                        >
-                          {renderPopupContent(popup.iconName)}
-                        </motion.div>
-                      )}
-                      
-                      {popup.position !== "center" && (
-                        <motion.div 
-                          className="w-full max-w-md mx-auto opacity-70 scale-90 blur-sm pointer-events-none"
-                          whileHover={{
-                            scale: 0.92,
-                            opacity: 0.75,
-                            filter: "blur(1px)",
-                            transition: { duration: 0.2 }
-                          }}
-                        >
-                          {renderPopupContent(popup.iconName)}
-                        </motion.div>
-                      )}
+                      {renderPopupContent(popup.iconName)}
                     </motion.div>
                   ))}
-                </AnimatePresence>
+                </div>
 
                 {/* Setas de navegação */}
                 <div className="absolute w-full flex justify-between px-4 sm:px-8 md:px-12 pointer-events-none">
