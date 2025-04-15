@@ -65,7 +65,7 @@
     const [viewMode, setViewMode] = useState<"carousel" | "detail">("carousel");
     const [selectedColor, setSelectedColor] = useState<ColorVariant>("Breeze");
     const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
-    const [showModel3D, setShowModel3D] = useState(false);
+    const [showModel3D, setShowModel3D] = useState(true);
     const [modelLoadError, setModelLoadError] = useState(false);
     const [activePopup, setActivePopup] = useState<string | null>(null);
     const [activeIconRef, setActiveIconRef] = useState<HTMLDivElement | null>(null);
@@ -333,6 +333,11 @@
     const toggleModelView = () => {
       setShowModel3D(prev => !prev);
     };
+
+    // Garantir que ao trocar de cor, o modelo 3D permanece visível se essa for a preferência
+    useEffect(() => {
+      // Preservar showModel3D ao trocar de cor
+    }, [selectedColor]);
 
     // Função para lidar com cliques nos ícones
     const handleIconClick = (iconName: string, event: ReactMouseEvent) => {
@@ -1211,7 +1216,6 @@
                                 key={colorObj.color}
                                 onClick={() => {
                                   handleColorChange(colorObj.variant as ColorVariant);
-                                  setShowModel3D(false);
                                 }}
                                 style={{
                                   transform: `translate(${offset * xSpacing}px, ${yOffset}px)`,
