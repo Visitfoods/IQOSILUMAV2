@@ -24,20 +24,20 @@
       name: "ILUMAi BREEZE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi/ILUMAi_BREEZE.png", 
       baseModel: "ILUMAi", 
-      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
+      modelPath: "/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
     },
     { 
       id: 2, 
       name: "ILUMAi ONE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", 
       baseModel: "ILUMAi-ONE",
-      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+      modelPath: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
       modelPaths: {
-        Breeze: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
-        Midnight: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
-        Leaf: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
-        Terracotta: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
-        Violet: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
+        Breeze: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+        Midnight: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
+        Leaf: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
+        Terracotta: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
+        Violet: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
       }
     },
     { 
