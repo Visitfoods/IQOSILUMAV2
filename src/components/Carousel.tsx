@@ -390,14 +390,21 @@ export default function Carousel() {
 
   // Componente GlobalPopup para renderizar o popup fora dos containers dos ícones
   const GlobalPopup = () => {
+    // Estados para controlar o deslocamento contínuo
+    const [dragOffset, setDragOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    
     // Não renderizar nada se não houver popup ativo
     if (!activePopup || !activeIconRef) return null;
     
     // Definir todos os ícones disponíveis para o carrossel
     const availableIcons = selectedMachine ? getAvailableIcons(selectedMachine.baseModel) : [];
     const activeIndex = availableIcons.findIndex(icon => icon === activePopup);
-    const prevIndex = (activeIndex - 1 + availableIcons.length) % availableIcons.length;
-    const nextIndex = (activeIndex + 1) % availableIcons.length;
+    
+    // Configurar dimensões e limiares
+    const cardWidth = 350; // Largura base do cartão (ajustado para o layout)
+    const cardGap = 60; // Espaço entre os cartões
+    const swipeThreshold = 100; // Limiar para completar um swipe
     
     // Obter informações dos popups
     const getPopupContent = (iconName: string) => {
@@ -451,89 +458,146 @@ export default function Carousel() {
       return { title, content, iconSrc };
     };
     
-    // Renderizar um popup individual
-    const renderPopupCard = (iconName: string, variant: string = "center") => {
+    // Renderizar um popup individual com posição dinâmica baseada no índice e offset
+    const renderPopupCard = (iconName: string, indexOffset: number) => {
       const { title, content, iconSrc } = getPopupContent(iconName);
-      const isActive = variant === "center";
+      
+      // Calcular a posição base do cartão (sem o arrasto)
+      const basePosition = indexOffset * (cardWidth + cardGap);
+      // Aplicar o offset de arrasto atual
+      const totalOffset = basePosition + dragOffset;
+      
+      // Calcular propriedades visuais baseadas na distância do centro
+      const distance = Math.abs(totalOffset);
+      const scale = Math.max(0.75, 1 - (distance / (cardWidth + cardGap) * 0.25));
+      const opacity = Math.max(0.7, 1 - (distance / (cardWidth + cardGap) * 0.3));
+      const blur = Math.min(2, distance / (cardWidth + cardGap) * 3);
+      const zIndex = distance < 20 ? 10 : 5; // Cartão central tem z-index mais alto
+      
+      // Determinar se este é o cartão central
+      const isCenter = Math.abs(indexOffset) === 0 && !isDragging;
       
       return (
-        <div className={`w-full bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}`}>
-          <div className="relative">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-2 ring-2 ring-[#5CD9E8]/60">
-                <Image
-                  src={iconSrc}
-                  alt={title}
-                  width={48}
-                  height={48}
-                  className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
-                />
+        <motion.div
+          key={`card-${iconName}-${indexOffset}`}
+          className="absolute top-0 left-1/2 w-full max-w-md"
+          style={{
+            x: totalOffset,
+            scale,
+            opacity,
+            filter: `blur(${blur}px)`,
+            zIndex,
+            transform: `translateX(-50%) translateX(${totalOffset}px) scale(${scale})`,
+            pointerEvents: isCenter ? 'auto' : 'none'
+          }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 300, 
+            damping: 30,
+            mass: 0.8,
+            velocity: isDragging ? 0 : 10
+          }}
+        >
+          <div className={`w-full bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl`}>
+            <div className="relative">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-2 ring-2 ring-[#5CD9E8]/60">
+                  <Image
+                    src={iconSrc}
+                    alt={title}
+                    width={48}
+                    height={48}
+                    className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
+                  />
+                </div>
+                <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">
+                  {title}
+                </h3>
               </div>
-              <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">
-                {title}
-              </h3>
-            </div>
-            
-            {isActive && (
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActivePopup(null);
-                  setActiveIconRef(null);
-                }}
-                className="absolute top-0 right-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1A6A72]/60 backdrop-blur-md hover:bg-[#1A6A72] transition-colors border border-[#5CD9E8]/30"
-                aria-label="Fechar"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              
+              {isCenter && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActivePopup(null);
+                    setActiveIconRef(null);
+                  }}
+                  className="absolute top-0 right-0 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1A6A72]/60 backdrop-blur-md hover:bg-[#1A6A72] transition-colors border border-[#5CD9E8]/30"
+                  aria-label="Fechar"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              
+              <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">
+                {content}
+              </div>
+              
+              {isCenter && (
+                <svg 
+                  className="absolute inset-[-2px] w-[calc(100%+4px)] h-[calc(100%+4px)] z-[-1]"
+                  viewBox="0 0 1000 1000" 
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#5CD9E8" stopOpacity="1"/>
+                      <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0"/>
+                    </linearGradient>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="8" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+                  <rect
+                    x="2"
+                    y="2"
+                    width="996"
+                    height="996"
+                    fill="none"
+                    stroke="url(#snakeGradient)"
+                    strokeWidth="4"
+                    strokeDasharray="1000"
+                    strokeLinecap="round"
+                    rx="16"
+                    ry="16"
+                    filter="url(#glow)"
+                    style={{
+                      animation: 'snake 8s linear infinite'
+                    }}
+                  />
                 </svg>
-              </button>
-            )}
-            
-            <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">
-              {content}
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
       );
     };
-    
-    // Variantes de animação para o carrossel de popups
-    const popupVariants = {
-      enter: (direction: "left" | "right") => ({
-        x: direction === "right" ? 1000 : -1000,
-        opacity: 0,
-        scale: 0.75,
-        filter: "blur(4px)",
-      }),
-      center: {
-        x: 0,
-        opacity: 1,
-        scale: 1,
-        zIndex: 10,
-        filter: "blur(0px)",
-      },
-      left: {
-        x: "-35%",
-        opacity: 0.7,
-        scale: 0.75,
-        zIndex: 5,
-        filter: "blur(2px)",
-      },
-      right: {
-        x: "35%",
-        opacity: 0.7,
-        scale: 0.75,
-        zIndex: 5, 
-        filter: "blur(2px)",
-      },
-      exit: (direction: "left" | "right") => ({
-        x: direction === "right" ? -1000 : 1000,
-        opacity: 0,
-        scale: 0.75,
-        filter: "blur(4px)",
-      })
+
+    // Processar o fim de um arrasto
+    const handleDragEnd = (e: any, info: any) => {
+      setIsDragging(false);
+      const offset = info.offset.x;
+      
+      // Se o arrasto ultrapassou o limiar, mudar para o próximo/anterior cartão
+      if (Math.abs(offset) > swipeThreshold) {
+        const direction = offset > 0 ? "left" : "right";
+        const newIndex = direction === "right"
+          ? (activeIndex + 1) % availableIcons.length
+          : (activeIndex - 1 + availableIcons.length) % availableIcons.length;
+        
+        setSwipeDirection(direction);
+        setActivePopup(availableIcons[newIndex]);
+      }
+      
+      // Resetar o offset após completar/cancelar o arrasto
+      setDragOffset(0);
     };
+    
+    // Criar um array com índices para renderizar (incluindo cartões vizinhos)
+    const cardIndexesToRender = [-2, -1, 0, 1, 2];
     
     return (
       <>
@@ -551,142 +615,46 @@ export default function Carousel() {
 
         <div className="fixed inset-0 flex items-center justify-center z-[150]">
           <div className="relative w-full max-w-5xl px-4">
-            {/* Carrossel de popups */}
-            <div className="relative flex justify-center items-center">
-              <AnimatePresence mode="sync" initial={false} custom={swipeDirection}>
-                {/* Popup Esquerdo */}
-                <motion.div
-                  key={`left-${availableIcons[prevIndex]}`}
-                  variants={popupVariants}
-                  initial="enter"
-                  animate="left"
-                  exit="exit"
-                  custom={swipeDirection}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 300, 
-                    damping: 30,
-                    mass: 0.8
-                  }}
-                  className="absolute left-0 w-[30%] max-w-xs"
-                  style={{ zIndex: 1 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateToNextIcon("left");
-                  }}
-                >
-                  {renderPopupCard(availableIcons[prevIndex])}
-                </motion.div>
-
-                {/* Popup Central */}
-                <motion.div
-                  key={`center-${activePopup}`}
-                  variants={popupVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  custom={swipeDirection}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 300, 
-                    damping: 30,
-                    mass: 0.8
-                  }}
-                  className="relative w-full max-w-md z-10"
-                  id="popup-container"
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.2}
-                  onClick={(e) => e.stopPropagation()}
-                  onDragEnd={(e, { offset }) => {
-                    if (Math.abs(offset.x) > 100) {
-                      navigateToNextIcon(offset.x < 0 ? "right" : "left");
-                    }
-                  }}
-                >
-                  {renderPopupCard(activePopup)}
-                  
-                  {/* Efeito "snake" contínuo ao redor do popup */}
-                  <svg 
-                    className="absolute inset-[-2px] w-[calc(100%+4px)] h-[calc(100%+4px)] z-[-1]"
-                    viewBox="0 0 1000 1000" 
-                    preserveAspectRatio="none"
-                  >
-                    <defs>
-                      <linearGradient id="snakeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#5CD9E8" stopOpacity="1"/>
-                        <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0"/>
-                      </linearGradient>
-                      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="8" result="blur" />
-                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                      </filter>
-                    </defs>
-                    <rect
-                      x="2"
-                      y="2"
-                      width="996"
-                      height="996"
-                      fill="none"
-                      stroke="url(#snakeGradient)"
-                      strokeWidth="4"
-                      strokeDasharray="1000"
-                      strokeLinecap="round"
-                      rx="16"
-                      ry="16"
-                      filter="url(#glow)"
-                      style={{
-                        animation: 'snake 8s linear infinite'
-                      }}
-                    />
-                  </svg>
-                </motion.div>
-
-                {/* Popup Direito */}
-                <motion.div
-                  key={`right-${availableIcons[nextIndex]}`}
-                  variants={popupVariants}
-                  initial="enter"
-                  animate="right"
-                  exit="exit"
-                  custom={swipeDirection}
-                  transition={{ 
-                    type: "spring", 
-                    stiffness: 300, 
-                    damping: 30,
-                    mass: 0.8
-                  }}
-                  className="absolute right-0 w-[30%] max-w-xs"
-                  style={{ zIndex: 1 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateToNextIcon("right");
-                  }}
-                >
-                  {renderPopupCard(availableIcons[nextIndex])}
-                </motion.div>
-              </AnimatePresence>
-              
-              {/* Botões de navegação */}
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToNextIcon("left");
-                }}
-                className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-20"
-              >
-                <ChevronLeftIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToNextIcon("right");
-                }}
-                className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-20"
-              >
-                <ChevronRightIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
-              </button>
-            </div>
+            {/* Carrossel de popups com animação fluida */}
+            <motion.div
+              className="relative flex justify-center items-center h-[500px]"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.3}
+              onDrag={(e, info) => {
+                setIsDragging(true);
+                setDragOffset(info.offset.x);
+              }}
+              onDragEnd={handleDragEnd}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Renderizar múltiplos cartões para criar o efeito de carrossel infinito */}
+              {cardIndexesToRender.map(indexOffset => {
+                // Calcular qual cartão mostrar nesta posição
+                const actualIndex = (activeIndex + indexOffset + availableIcons.length) % availableIcons.length;
+                return renderPopupCard(availableIcons[actualIndex], indexOffset);
+              })}
+            </motion.div>
+            
+            {/* Botões de navegação */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToNextIcon("left");
+              }}
+              className="absolute left-4 sm:left-8 md:left-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-20"
+            >
+              <ChevronLeftIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+            </button>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                navigateToNextIcon("right");
+              }}
+              className="absolute right-4 sm:right-8 md:right-12 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-20"
+            >
+              <ChevronRightIcon className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+            </button>
 
             {/* Carrossel de ícones (miniaturas) */}
             <div className="absolute left-0 right-0 bottom-[-3rem] sm:bottom-[-4rem] md:bottom-[-5rem] flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
