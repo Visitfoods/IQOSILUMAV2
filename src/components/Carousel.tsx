@@ -487,7 +487,7 @@ export default function Carousel() {
             opacity,
             filter: `blur(${blur}px)`,
             zIndex,
-            transform: `translateX(-50%) translateX(${totalOffset}px) scale(${scale})`,
+            transform: `translateX(calc(-50% + ${totalOffset}px)) scale(${scale})`,
             pointerEvents: isCenter ? 'auto' : 'none'
           }}
           transition={{ 
@@ -614,10 +614,10 @@ export default function Carousel() {
         />
 
         <div className="fixed inset-0 flex items-center justify-center z-[150]">
-          <div className="relative w-full max-w-5xl px-4">
+          <div className="relative w-full max-w-5xl flex justify-center items-center px-4">
             {/* Carrossel de popups com animação fluida */}
             <motion.div
-              className="relative flex justify-center items-center h-[500px]"
+              className="relative flex justify-center items-center h-[500px] w-full"
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.3}
@@ -628,12 +628,14 @@ export default function Carousel() {
               onDragEnd={handleDragEnd}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Renderizar múltiplos cartões para criar o efeito de carrossel infinito */}
-              {cardIndexesToRender.map(indexOffset => {
-                // Calcular qual cartão mostrar nesta posição
-                const actualIndex = (activeIndex + indexOffset + availableIcons.length) % availableIcons.length;
-                return renderPopupCard(availableIcons[actualIndex], indexOffset);
-              })}
+              <div className="absolute inset-0 flex items-center justify-center">
+                {/* Renderizar múltiplos cartões para criar o efeito de carrossel infinito */}
+                {cardIndexesToRender.map(indexOffset => {
+                  // Calcular qual cartão mostrar nesta posição
+                  const actualIndex = (activeIndex + indexOffset + availableIcons.length) % availableIcons.length;
+                  return renderPopupCard(availableIcons[actualIndex], indexOffset);
+                })}
+              </div>
             </motion.div>
             
             {/* Botões de navegação */}
