@@ -36,7 +36,7 @@ function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelVie
   return (
     <Stage
       preset="soft"
-      intensity={2.5}
+      intensity={1.8}
       environment="city"
       shadows={false}
       adjustCamera={false}
@@ -103,24 +103,24 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         antialias: true,
         alpha: true,
         toneMapping: ACESFilmicToneMapping,
-        toneMappingExposure: 2.0
+        toneMappingExposure: 1.5
       }}
       onCreated={({ gl }) => {
         gl.toneMapping = ACESFilmicToneMapping;
-        gl.toneMappingExposure = 2.0;
+        gl.toneMappingExposure = 1.5;
       }}
     >
       {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
-      <ambientLight intensity={5.0} />
-      <hemisphereLight intensity={4.0} color="#ffffff" groundColor="#e0e0ff" />
+      <ambientLight intensity={3.5} />
+      <hemisphereLight intensity={2.5} color="#ffffff" groundColor="#e0e0ff" />
       <directionalLight 
         position={[5, 10, 5]} 
-        intensity={1.5} 
+        intensity={1.0} 
         castShadow={false} 
       />
       <directionalLight 
         position={[-5, 5, -5]} 
-        intensity={1.0} 
+        intensity={0.7} 
         castShadow={false} 
       />
       
