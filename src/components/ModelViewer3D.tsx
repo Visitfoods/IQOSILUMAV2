@@ -110,9 +110,6 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         gl.toneMappingExposure = 2.0;
       }}
     >
-      <color attach="background" args={['#ffffff']} />
-      <fog attach="fog" args={['#ffffff', 50, 70]} />
-      
       {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
       <ambientLight intensity={5.0} />
       <hemisphereLight intensity={4.0} color="#ffffff" groundColor="#e0e0ff" />
