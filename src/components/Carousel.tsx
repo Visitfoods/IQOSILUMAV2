@@ -458,53 +458,7 @@ export default function Carousel() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Efeito "snake" flutuante - ajustado com margem de 3% em relação ao popup */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-[140]" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="snakeGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#5CD9E8" stopOpacity="1" />
-                <stop offset="100%" stopColor="#5CD9E8" stopOpacity="0" />
-              </linearGradient>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="6" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
-            {/* O popup tem 85% de largura, adicionamos 3% em cada lado para o snake (91% total) */}
-            <rect 
-              x="calc(50% - 45.5%)"
-              y="calc(50% - 22%)"
-              width="91%"
-              height="44%"
-              rx="10" 
-              ry="10" 
-              fill="none" 
-              stroke="url(#snakeGradient3)" 
-              strokeWidth="3"
-              className="continuous-snake-path"
-              filter="url(#glow)"
-            />
-          </svg>
-
-          <style jsx global>{`
-            @keyframes continuousSnakeAnim {
-              0% {
-                stroke-dashoffset: 1000;
-              }
-              100% {
-                stroke-dashoffset: 0;
-              }
-            }
-
-            .continuous-snake-path {
-              stroke-dasharray: 1000;
-              stroke-linecap: round;
-              animation: continuousSnakeAnim 8s linear infinite;
-              filter: drop-shadow(0 0 10px #5CD9E8);
-            }
-          `}</style>
-          
-          {/* Container do carrossel */}
+          {/* Popup principal (centro) */}
           <div className="relative flex items-center justify-center w-full perspective-[1200px]">
             <AnimatePresence mode="sync" initial={false}>
               {/* Popup anterior (esquerda) */}
