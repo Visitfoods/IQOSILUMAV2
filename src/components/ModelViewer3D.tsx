@@ -14,13 +14,21 @@ interface ModelViewerProps {
 }
 
 function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelViewerProps) {
+  const [hasError, setHasError] = useState(false);
+
   // Hook sempre chamado incondicionalmente
-  const { scene } = useGLTF(modelPath, undefined, 
-    (error) => {
-      console.error("Erro ao carregar modelo:", error);
+  let scene;
+  try {
+    const gltf = useGLTF(modelPath);
+    scene = gltf.scene;
+  } catch (error) {
+    console.error("Erro ao carregar modelo:", error);
+    if (!hasError) {
+      setHasError(true);
       if (onError) onError();
     }
-  );
+    return null;
+  }
   
   if (!scene) return null;
   
@@ -63,12 +71,17 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
 export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 0], autoRotate = false, onError }: ModelViewerProps) {
   const controlsRef = useRef(null);
 
+  // Precarregar o modelo
   useEffect(() => {
-    // Descarregar o modelo quando o componente for desmontado
+    try {
+      useGLTF.preload(modelPath);
+    } catch (error) {
+      console.error("Erro ao precarregar modelo:", error);
+    }
+    
+    // Limpeza ao desmontar
     return () => {
-      if (modelPath) {
-        useGLTF.preload(modelPath);
-      }
+      // Nenhuma ação necessária para limpeza
     };
   }, [modelPath]);
 
