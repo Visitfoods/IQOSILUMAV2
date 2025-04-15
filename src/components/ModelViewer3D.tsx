@@ -2,8 +2,9 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useGLTF, Environment, Stage, ContactShadows } from '@react-three/drei';
+import { OrbitControls, useGLTF, Environment, Stage, ContactShadows, SoftShadows } from '@react-three/drei';
 import * as THREE from 'three';
+import { ACESFilmicToneMapping } from 'three';
 
 interface ModelViewerProps {
   modelPath: string;
@@ -35,8 +36,8 @@ function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelVie
   return (
     <Stage
       preset="soft"
-      intensity={0.6}
-      environment="city"
+      intensity={1.8}
+      environment="studio"
       shadows={false}
       adjustCamera={false}
     >
@@ -96,19 +97,32 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
   return (
     <Canvas
       style={{ width: '100%', height: '100%' }}
-      camera={{ position: [0, 0, 10], fov: 50 }}
-      shadows={false}
+      camera={{ position: [0, 5, 15], fov: 45 }}
+      shadows={true}
       gl={{ 
         antialias: true,
         alpha: true,
+        toneMapping: ACESFilmicToneMapping,
+        toneMappingExposure: 1.5
+      }}
+      onCreated={({ gl }) => {
+        gl.toneMapping = ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.5;
       }}
     >
       <color attach="background" args={['#ffffff']} />
-      <fog attach="fog" args={['#ffffff', 40, 60]} />
+      <fog attach="fog" args={['#ffffff', 50, 70]} />
       
-      {/* Iluminação uniforme e suave */}
-      <ambientLight intensity={1.5} />
-      <hemisphereLight intensity={0.8} color="#ffffff" groundColor="#bbbbff" />
+      {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
+      <ambientLight intensity={3.0} />
+      <hemisphereLight intensity={3.0} color="#ffffff" groundColor="#e0e0ff" />
+      <directionalLight 
+        position={[5, 10, 5]} 
+        intensity={1.0} 
+        castShadow={false} 
+      />
+      
+      <SoftShadows size={25} samples={16} focus={0.5} />
       
       <ErrorBoundary onError={onError}>
         <Model 
@@ -129,7 +143,7 @@ export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 
         maxDistance={20}
       />
       
-      <Environment preset="city" background={false} />
+      <Environment preset="studio" background={false} />
     </Canvas>
   );
 } 
