@@ -12,16 +12,18 @@ interface ModelViewerProps {
   position?: [number, number, number];
   autoRotate?: boolean;
   onError?: () => void;
+  onLoad?: () => void;
 }
 
-function Model({ modelPath, scale = 3, position = [0, 0, 0], onError }: ModelViewerProps) {
+function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: ModelViewerProps) {
   const [hasError, setHasError] = useState(false);
 
   // Hook sempre chamado incondicionalmente
   let scene;
   try {
-    const gltf = useGLTF(modelPath);
+    const gltf = useGLTF(modelPath, true, undefined, onLoad);
     scene = gltf.scene;
+    if (onLoad) onLoad();
   } catch (error) {
     console.error("Erro ao carregar modelo:", error);
     if (!hasError) {
@@ -77,7 +79,7 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
   }
 }
 
-export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError }: ModelViewerProps) {
+export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError, onLoad }: ModelViewerProps) {
   const controlsRef = useRef(null);
 
   // Precarregar o modelo
@@ -132,6 +134,7 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
           scale={scale} 
           position={position} 
           onError={onError}
+          onLoad={onLoad}
         />
       </ErrorBoundary>
       

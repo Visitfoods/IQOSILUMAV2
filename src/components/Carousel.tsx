@@ -795,15 +795,28 @@
 
     // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
     const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
+      const [isLoading, setIsLoading] = useState(true);
       // Mostrar modelo 3D SEMPRE por predefinição para ILUMAi ONE, só mostrar imagem se houver erro
       const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
-      
+
+      // Resetar isLoading sempre que mudar de cor ou máquina
+      useEffect(() => {
+        setIsLoading(true);
+      }, [machine, colorVariant]);
+
+      const handleModelLoadSuccess = () => {
+        setIsLoading(false);
+      };
+
       return (
         <div className="relative flex items-center justify-center">
           {machine.baseModel === "ILUMAi-ONE" ? (
             <>
-              {/* ILUMAi ONE: Tenta carregar modelo 3D, fallback para imagem apenas se houver erro */}
-              {!modelLoadError ? (
+              {isLoading && !modelLoadError ? (
+                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] flex items-center justify-center">
+                  <p className="text-white">Carregando modelo 3D...</p>
+                </div>
+              ) : !modelLoadError ? (
                 <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
                   <ModelViewer3D 
                     modelPath={getModelPath(machine, colorVariant) || ""}
@@ -811,6 +824,7 @@
                     position={[0, 0, 0]}
                     autoRotate={true}
                     onError={handleModelLoadError}
+                    onLoad={handleModelLoadSuccess}
                   />
                 </div>
               ) : (
