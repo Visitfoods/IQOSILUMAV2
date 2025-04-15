@@ -66,6 +66,7 @@
     const [selectedColor, setSelectedColor] = useState<ColorVariant>("Breeze");
     const [initialAnimationComplete, setInitialAnimationComplete] = useState(false);
     const [showModel3D, setShowModel3D] = useState(false);
+    const [modelLoadError, setModelLoadError] = useState(false);
     const [activePopup, setActivePopup] = useState<string | null>(null);
     const [activeIconRef, setActiveIconRef] = useState<HTMLDivElement | null>(null);
     const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(null);
@@ -317,8 +318,20 @@
         modelPath = `/IQOSILUMAV2${modelPath}`;
       }
 
+      console.log("Caminho do modelo 3D:", modelPath);
       return modelPath;
     };
+
+    // Manipulador de erro para o carregamento de modelos 3D
+    const handleModelLoadError = () => {
+      console.error("Erro ao carregar modelo 3D");
+      setModelLoadError(true);
+    };
+
+    // Reset do erro ao mudar de cor ou modelo
+    useEffect(() => {
+      setModelLoadError(false);
+    }, [selectedColor, selectedMachine]);
 
     // Alternar entre imagem 2D e modelo 3D
     const toggleModelView = () => {
@@ -779,6 +792,77 @@
       );
     };
 
+    // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
+    const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
+      // Sempre mostrar o modelo 3D para ILUMAi ONE
+      const shouldShow3D = machine.baseModel === "ILUMAi-ONE" && !modelLoadError;
+      
+      return (
+        <div className="relative flex items-center justify-center">
+          {machine.baseModel === "ILUMAi-ONE" && (
+            <>{shouldShow3D ? (
+              <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
+                <ModelViewer3D 
+                  modelPath={getModelPath(machine, colorVariant) || ""}
+                  scale={7}
+                  position={[0, 0, 0]}
+                  autoRotate={true}
+                  onError={handleModelLoadError}
+                />
+              </div>
+            ) : (
+              // Fallback para imagem quando o modelo 3D não carrega
+              <Image
+                src={getImagePath(machine, colorVariant)}
+                alt={machine.name}
+                width={400}
+                height={400}
+                className="w-32 sm:w-45 md:w-50 h-auto object-contain"
+                priority
+              />
+            )}</>
+          )}
+          
+          {machine.baseModel !== "ILUMAi-ONE" && (
+            <>
+              {/* Botão "Ver em 3D" para outros modelos */}
+              {machine.modelPath && (
+                <button
+                  onClick={toggleModelView}
+                  className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
+                  aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
+                >
+                  <CubeIcon className="w-5 h-5" />
+                  <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
+                </button>
+              )}
+              
+              {showModel3D && machine.modelPath ? (
+                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
+                  <ModelViewer3D 
+                    modelPath={getModelPath(machine) || ""}
+                    scale={7}
+                    position={[0, 0, 0]}
+                    autoRotate={true}
+                    onError={handleModelLoadError}
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={getImagePath(machine, colorVariant)}
+                  alt={machine.name}
+                  width={400}
+                  height={400}
+                  className="w-32 sm:w-45 md:w-50 h-auto object-contain"
+                  priority
+                />
+              )}
+            </>
+          )}
+        </div>
+      );
+    };
+
     if (!isMounted) {
       return null;
     }
@@ -998,17 +1082,8 @@
                             </motion.div>
                           </div>
 
-                          {/* Imagem central do dispositivo */}
-                          <div className="relative flex items-center justify-center">
-                            <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
-                              <ModelViewer3D 
-                                modelPath={getModelPath(selectedMachine, selectedColor) || ""}
-                                scale={7}
-                                position={[0, 0, 0]}
-                                autoRotate={true}
-                              />
-                            </div>
-                          </div>
+                          {/* Visualização central do dispositivo */}
+                          {selectedMachine && <DeviceViewer machine={selectedMachine} colorVariant={selectedColor} />}
 
                           {/* Ícone direito para ILUMAi ONE */}
                           <div className="absolute top-[calc(50%-50px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">
@@ -1071,40 +1146,8 @@
                             </motion.div>
                           </div>
 
-                          {/* Imagem central do dispositivo */}
-                          <div className="relative flex items-center justify-center">
-                            {/* Botão "Ver em 3D" */}
-                            {selectedMachine?.modelPath && (
-                              <button
-                                onClick={toggleModelView}
-                                className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
-                                aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
-                              >
-                                <CubeIcon className="w-5 h-5" />
-                                <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
-                              </button>
-                            )}
-                            
-                            {showModel3D && selectedMachine?.modelPath ? (
-                              <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
-                                <ModelViewer3D 
-                                  modelPath={getModelPath(selectedMachine) || ""}
-                                  scale={7}
-                                  position={[0, 0, 0]}
-                                  autoRotate={true}
-                                />
-                              </div>
-                            ) : (
-                              <Image
-                                src={getImagePath(selectedMachine!, selectedColor)}
-                                alt={selectedMachine?.name || ""}
-                                width={400}
-                                height={400}
-                                className="w-32 sm:w-45 md:w-50 h-auto object-contain"
-                                priority
-                              />
-                            )}
-                          </div>
+                          {/* Visualização central do dispositivo */}
+                          {selectedMachine && <DeviceViewer machine={selectedMachine} colorVariant={selectedColor} />}
 
                           {/* Ícones à direita para ILUMAi e ILUMAi PRIME */}
                           <div className="absolute top-[calc(50%-100px)] -translate-y-1/2 right-6 sm:right-12 md:right-16 flex flex-col items-center">

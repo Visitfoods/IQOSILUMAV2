@@ -1,81 +1,105 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useGLTF, PresentationControls, Environment } from "@react-three/drei";
-import * as THREE from "three";
+import React, { useRef, useEffect, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
 
 interface ModelViewerProps {
   modelPath: string;
   scale?: number;
   position?: [number, number, number];
-  rotation?: [number, number, number];
   autoRotate?: boolean;
-  bgColor?: string;
+  onError?: () => void;
 }
 
-function Model({ modelPath, scale = 1, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelViewerProps) {
-  const { scene } = useGLTF(modelPath);
-  const modelRef = useRef<THREE.Group>(null);
-  
-  // Auto-rotate a model
-  useFrame((state, delta) => {
-    if (modelRef.current && autoRotate) {
-      modelRef.current.rotation.y += delta * 0.2;
+function Model({ modelPath, scale = 1, position = [0, 0, 0], onError }: ModelViewerProps) {
+  // Hook sempre chamado incondicionalmente
+  const { scene } = useGLTF(modelPath, undefined, 
+    (error) => {
+      console.error("Erro ao carregar modelo:", error);
+      if (onError) onError();
     }
-  });
-
-  // Clone the scene to avoid sharing
-  const clonedScene = scene.clone();
-
+  );
+  
+  if (!scene) return null;
+  
   return (
-    <group ref={modelRef} position={position} rotation={rotation as any} scale={[scale, scale, scale]}>
-      <primitive object={clonedScene} />
-    </group>
+    <primitive 
+      object={scene} 
+      scale={scale} 
+      position={position} 
+    />
   );
 }
 
-export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true, bgColor = "transparent" }: ModelViewerProps) {
-  const [isMounted, setIsMounted] = useState(false);
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
-  if (!isMounted) {
-    return null;
+// Componente de fallback para capturar erros no carregamento de modelos
+class ErrorBoundary extends React.Component<{onError?: () => void, children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {onError?: () => void, children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
   }
 
-  return (
-    <div className="w-full h-full">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ background: bgColor }}
-      >
-        {/* Luz ambiente mínima apenas para ajudar a visualização */}
-        <ambientLight intensity={0.3} />
-        
-        {/* Ambiente para reflexões - dawn tem reflexos mais suaves */}
-        <Environment preset="dawn" />
-        
-        <PresentationControls
-          global
-          rotation={[0, 0, 0]}
-          polar={[-Math.PI / 3, Math.PI / 3]}
-          azimuth={[-Math.PI / 1.4, Math.PI / 2]}
-        >
-          <Model 
-            modelPath={modelPath} 
-            scale={scale} 
-            position={position} 
-            rotation={rotation} 
-            autoRotate={autoRotate}
-          />
-        </PresentationControls>
-      </Canvas>
-    </div>
-  );
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any) {
+    console.error("Erro no componente 3D:", error);
+    if (this.props.onError) {
+      this.props.onError();
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return null;
+    }
+
+    return this.props.children;
+  }
 }
 
-// Preload the model
-useGLTF.preload("/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb"); 
+export default function ModelViewer3D({ modelPath, scale = 1, position = [0, 0, 0], autoRotate = false, onError }: ModelViewerProps) {
+  const controlsRef = useRef(null);
+
+  useEffect(() => {
+    // Descarregar o modelo quando o componente for desmontado
+    return () => {
+      if (modelPath) {
+        useGLTF.preload(modelPath);
+      }
+    };
+  }, [modelPath]);
+
+  return (
+    <Canvas
+      style={{ width: '100%', height: '100%' }}
+      camera={{ position: [0, 0, 10], fov: 50 }}
+      shadows
+    >
+      <ambientLight intensity={0.5} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} />
+      
+      <ErrorBoundary onError={onError}>
+        <Model 
+          modelPath={modelPath} 
+          scale={scale} 
+          position={position} 
+          onError={onError}
+        />
+      </ErrorBoundary>
+      
+      <OrbitControls 
+        ref={controlsRef} 
+        autoRotate={autoRotate} 
+        autoRotateSpeed={1.5} 
+        enableZoom={true}
+        enablePan={false}
+        minDistance={5}
+        maxDistance={20}
+      />
+    </Canvas>
+  );
+} 
