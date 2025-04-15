@@ -578,12 +578,9 @@ export default function Carousel() {
     
     // Gerar cards para o carrossel (renderiza todos os popups)
     const renderCards = () => {
-      // Criar cards para permitir um carrossel infinito
-      // Nós renderizamos todos os cards, mas só mostramos os 3 mais próximos
       return availableIcons.map((iconName, index) => {
         // Calcular a posição relativa (distância em índices do card ativo)
         const relativePosition = ((index - activeIndex) + totalCards) % totalCards;
-        // Ajustar para que valores fiquem entre -floor(totalCards/2) e floor(totalCards/2)
         const adjustedPosition = relativePosition > Math.floor(totalCards / 2) 
           ? relativePosition - totalCards 
           : relativePosition;
@@ -604,8 +601,7 @@ export default function Carousel() {
             key={`popup-card-${iconName}`}
             className="absolute"
             style={{ 
-              left: `calc(50% + ${xPosition}px)`,
-              transform: `translateX(-50%) scale(${scale})`,
+              x: xPosition,
               scale: scale,
               opacity: opacity,
               filter: `blur(${blur}px)`,
@@ -653,45 +649,45 @@ export default function Carousel() {
         />
 
         <div className="fixed inset-0 flex items-center justify-center z-[150]" onClick={(e) => e.stopPropagation()}>
-          <div className="relative w-full h-[70vh] sm:h-[60vh] md:h-[50vh]">
-            <div className="relative w-full h-full flex items-center justify-center">
-              <div className="relative w-full h-full flex items-center justify-center">
-                
-                {/* Áreas para cliques de navegação */}
-                <button 
-                  className="absolute left-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+          <div className="relative w-full max-w-5xl">
+            <div className="relative w-full h-[70vh] sm:h-[60vh] md:h-[50vh] flex items-center justify-center">
+              {/* Carrossel contínuo de popups */}
+              <motion.div
+                className="relative flex justify-center items-center w-full h-full"
+                style={{ left: '50%', transform: 'translateX(-50%)' }}
+              >
+                {renderCards()}
+              </motion.div>
+
+              {/* Áreas para cliques de navegação */}
+              <button 
+                className="absolute left-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+                onClick={navigatePrev}
+                aria-label="Popup anterior"
+              />
+              
+              <button 
+                className="absolute right-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+                onClick={navigateNext}
+                aria-label="Próximo popup"
+              />
+
+              {/* Setas de navegação */}
+              <div className="absolute w-full flex justify-between px-4 sm:px-8 md:px-12 pointer-events-none">
+                <button
                   onClick={navigatePrev}
-                  aria-label="Popup anterior"
-                />
-                
-                <button 
-                  className="absolute right-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+                  className="text-white p-2 hover:text-gray-300 transition-colors pointer-events-auto"
+                  aria-label="Anterior"
+                >
+                  <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
+                </button>
+                <button
                   onClick={navigateNext}
-                  aria-label="Próximo popup"
-                />
-
-                {/* Carrossel contínuo de popups */}
-                <div className="relative flex justify-center items-center w-full h-full">
-                  {renderCards()}
-                </div>
-
-                {/* Setas de navegação */}
-                <div className="absolute w-full flex justify-between px-4 sm:px-8 md:px-12 pointer-events-none">
-                  <button
-                    onClick={navigatePrev}
-                    className="text-white p-2 hover:text-gray-300 transition-colors pointer-events-auto"
-                    aria-label="Anterior"
-                  >
-                    <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
-                  </button>
-                  <button
-                    onClick={navigateNext}
-                    className="text-white p-2 hover:text-gray-300 transition-colors pointer-events-auto"
-                    aria-label="Próximo"
-                  >
-                    <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
-                  </button>
-                </div>
+                  className="text-white p-2 hover:text-gray-300 transition-colors pointer-events-auto"
+                  aria-label="Próximo"
+                >
+                  <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
+                </button>
               </div>
             </div>
 
