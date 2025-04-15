@@ -574,7 +574,7 @@
         );
       };
       
-      // Renderizar cards para o carrossel
+      // Gerar cards para o carrossel
       const renderCards = () => {
         return availableIcons.map((iconName, index) => {
           // Calcular a posição relativa ao card ativo
@@ -586,7 +586,7 @@
           }
           
           // Calcular posição com base no offset atual
-          const xPosition = positionOffset * cardWidth + currentOffset;
+          const xPosition = positionOffset * cardWidth + (isDragging ? currentOffset : 0);
           const isCurrent = index === activeIndex;
           const distance = Math.abs(xPosition);
           
@@ -602,15 +602,23 @@
                 zIndex: isCurrent ? 100 : 100 - Math.abs(positionOffset) * 10,
                 pointerEvents: isCurrent ? 'auto' : 'none',
               }}
+              initial={{ x: xPosition }}
+              animate={{
+                x: xPosition,
+                scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
+                opacity: isCurrent ? 1 : Math.max(0.6, 1 - (distance / cardWidth * 0.3)),
+                filter: `blur(${isCurrent ? 0 : Math.min(5, distance / cardWidth * 2)}px)`,
+                zIndex: isCurrent ? 100 : 100 - Math.abs(positionOffset) * 10,
+              }}
               transition={{
                 type: "spring",
-                stiffness: isDragging ? 1000 : 300,
-                damping: isDragging ? 100 : 30,
-                bounce: 0.2,
+                stiffness: 400,
+                damping: 40,
+                bounce: 0.1,
               }}
               drag={isCurrent ? "x" : false}
               dragConstraints={{ left: -cardWidth, right: cardWidth }}
-              dragElastic={0.3}
+              dragElastic={0.2}
               onDragStart={() => setIsDragging(true)}
               onDrag={(e, info) => {
                 if (isCurrent) {
