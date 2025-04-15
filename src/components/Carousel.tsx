@@ -795,15 +795,15 @@
 
     // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
     const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
-      // Mostrar modelo 3D para ILUMAi ONE se não houver erro de carregamento
+      // Mostrar modelo 3D SEMPRE por predefinição para ILUMAi ONE, só mostrar imagem se houver erro
       const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
       
       return (
         <div className="relative flex items-center justify-center">
           {machine.baseModel === "ILUMAi-ONE" ? (
             <>
-              {/* ILUMAi ONE: Tenta carregar modelo 3D, fallback para imagem */}
-              {shouldShow3D ? (
+              {/* ILUMAi ONE: Tenta carregar modelo 3D, fallback para imagem apenas se houver erro */}
+              {!modelLoadError ? (
                 <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
                   <ModelViewer3D 
                     modelPath={getModelPath(machine, colorVariant) || ""}
@@ -837,7 +837,6 @@
                   <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
                 </button>
               )}
-              
               {shouldShow3D ? (
                 <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
                   <ModelViewer3D 
