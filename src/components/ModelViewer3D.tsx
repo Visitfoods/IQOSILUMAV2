@@ -17,27 +17,52 @@ interface ModelViewerProps {
 
 function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: ModelViewerProps) {
   const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  console.log('ModelViewer3D está a tentar carregar:', modelPath);
+  
+  // Hooks devem estar no topo do componente, não dentro de condicionais
   const gltf = useGLTF(modelPath);
-
+  
+  // useEffect para detetar quando o modelo está carregado
   useEffect(() => {
-    if (gltf && gltf.scene && onLoad) {
-      onLoad();
+    if (gltf && gltf.scene) {
+      console.log('Modelo 3D carregado com sucesso:', modelPath);
+      setIsLoaded(true);
+      if (onLoad && !isLoaded) {
+        console.log('Chamando onLoad callback');
+        onLoad();
+      }
     }
-  }, [gltf, onLoad]);
+  }, [gltf, modelPath, onLoad, isLoaded]);
 
+  // Tratar erros após os Hooks
   let scene;
   try {
     scene = gltf.scene;
   } catch (error) {
-    console.error("Erro ao carregar modelo:", error);
+    console.error('Erro ao acessar gltf.scene:', error);
     if (!hasError) {
       setHasError(true);
-      if (onError) onError();
+      if (onError) {
+        console.log('Chamando onError devido a falha no acesso à scene');
+        onError();
+      }
     }
     return null;
   }
   
-  if (!scene) return null;
+  if (!scene) {
+    console.error('Scene é null ou undefined para o modelo:', modelPath);
+    if (!hasError) {
+      setHasError(true);
+      if (onError) {
+        console.log('Chamando onError porque scene é null');
+        onError();
+      }
+    }
+    return null;
+  }
   
   return (
     <Stage
@@ -85,11 +110,15 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
 
 export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError, onLoad }: ModelViewerProps) {
   const controlsRef = useRef(null);
+  
+  console.log('ModelViewer3D inicializado com modelPath:', modelPath);
 
   // Precarregar o modelo
   useEffect(() => {
     try {
+      console.log('Tentando precarregar o modelo:', modelPath);
       useGLTF.preload(modelPath);
+      console.log('Modelo precarregado com sucesso');
     } catch (error) {
       console.error("Erro ao precarregar modelo:", error);
     }
@@ -99,6 +128,11 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
       // Nenhuma ação necessária para limpeza
     };
   }, [modelPath]);
+
+  const handleModelError = () => {
+    console.error("Erro capturado pelo ModelViewer3D:", modelPath);
+    if (onError) onError();
+  };
 
   return (
     <Canvas
@@ -132,12 +166,12 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
       
       <SoftShadows size={25} samples={16} focus={0.5} />
       
-      <ErrorBoundary onError={onError}>
+      <ErrorBoundary onError={handleModelError}>
         <Model 
           modelPath={modelPath} 
           scale={scale} 
           position={position} 
-          onError={onError}
+          onError={handleModelError}
           onLoad={onLoad}
         />
       </ErrorBoundary>

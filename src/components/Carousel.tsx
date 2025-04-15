@@ -301,7 +301,10 @@
 
     // Função para obter o caminho do modelo 3D
     const getModelPath = (machine: Machine, colorVariant?: ColorVariant) => {
-      if (!machine) return null;
+      if (!machine) {
+        console.error('getModelPath: machine é null ou undefined');
+        return null;
+      }
 
       let modelPath = '';
       if (machine.baseModel === "ILUMAi-ONE") {
@@ -311,16 +314,19 @@
       }
 
       // Se não houver modelPath, retorna null
-      if (!modelPath) return null;
+      if (!modelPath) {
+        console.error('getModelPath: modelPath é vazio para', machine.baseModel, colorVariant || selectedColor);
+        return null;
+      }
 
-      // O caminho já deve começar com /IQOSILUMAV2/
-      console.log("Caminho do modelo 3D:", modelPath);
+      // Verificar se o caminho é válido
+      console.log("Caminho final do modelo 3D:", modelPath);
       return modelPath;
     };
 
     // Manipulador de erro para o carregamento de modelos 3D
     const handleModelLoadError = () => {
-      console.error("Erro ao carregar modelo 3D");
+      console.error("Erro global ao carregar modelo 3D");
       setModelLoadError(true);
     };
 
@@ -799,13 +805,27 @@
       // Mostrar modelo 3D SEMPRE por predefinição para ILUMAi ONE, só mostrar imagem se houver erro
       const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
 
+      // Debug logs
+      console.log('DeviceViewer para:', machine.baseModel);
+      console.log('- modelLoadError:', modelLoadError);
+      console.log('- isLoading:', isLoading);
+      console.log('- shouldShow3D:', shouldShow3D);
+      console.log('- Caminho do modelo:', getModelPath(machine, colorVariant));
+      
       // Resetar isLoading sempre que mudar de cor ou máquina
       useEffect(() => {
+        console.log('DeviceViewer: Resetando isLoading para true');
         setIsLoading(true);
       }, [machine, colorVariant]);
 
       const handleModelLoadSuccess = () => {
+        console.log('DeviceViewer: Modelo carregado com sucesso!');
         setIsLoading(false);
+      };
+      
+      const handleModelLoadError = () => {
+        console.error('DeviceViewer: Erro ao carregar o modelo 3D');
+        setModelLoadError(true);
       };
 
       return (
