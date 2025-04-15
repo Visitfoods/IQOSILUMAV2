@@ -326,39 +326,80 @@ export default function Carousel() {
     };
   }, [activePopup, activeIconRef]);
   
+  // Variantes de animação para os popups
+  const popupVariants = {
+    enter: (direction: "left" | "right") => ({
+      x: direction === "right" ? "100%" : "-100%",
+      opacity: 0,
+      scale: 0.8,
+      rotateY: direction === "right" ? -45 : 45,
+      filter: "blur(4px)"
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      filter: "blur(0px)"
+    },
+    exit: (direction: "left" | "right") => ({
+      x: direction === "right" ? "-100%" : "100%",
+      opacity: 0,
+      scale: 0.8,
+      rotateY: direction === "right" ? 45 : -45,
+      filter: "blur(4px)"
+    })
+  };
+
+  // Definir os ícones disponíveis
+  const getAvailableIcons = (baseModel: string) => {
+    return baseModel === "ILUMAi-ONE" 
+      ? ["FlexPuffONE", "InicioAutomatico"] 
+      : ["FlexPuff", "FlexBattery", "ModoPausa", "EcraTatil"];
+  };
+
+  // Obter informações dos ícones
+  const getIconInfo = (iconName: string) => {
+    switch (iconName) {
+      case "FlexPuff":
+      case "FlexPuffONE":
+        return { src: "/IQOSILUMAV2/Icons/FlexPuff.svg", label: "Flex Puff" };
+      case "FlexBattery":
+        return { src: "/IQOSILUMAV2/Icons/FlexBattery.svg", label: "Flex Battery" };
+      case "ModoPausa":
+        return { src: "/IQOSILUMAV2/Icons/Modo Pausa.svg", label: "Modo Pausa" };
+      case "EcraTatil":
+        return { src: "/IQOSILUMAV2/Icons/EcraTatil.svg", label: "Ecrã Tátil" };
+      case "InicioAutomatico":
+        return { src: "/IQOSILUMAV2/Icons/InicioAutomatico.svg", label: "Início Automático" };
+      default:
+        return { src: "", label: "" };
+    }
+  };
+
+  // Função para navegar entre popups
+  const navigateToNextIcon = (direction: "left" | "right") => {
+    const availableIcons = selectedMachine ? getAvailableIcons(selectedMachine.baseModel) : [];
+    const totalIcons = availableIcons.length;
+    const currentIndex = availableIcons.findIndex(icon => icon === activePopup);
+    const newIndex = direction === "right"
+      ? (currentIndex + 1) % totalIcons
+      : (currentIndex - 1 + totalIcons) % totalIcons;
+
+    setSwipeDirection(direction);
+    setActivePopup(availableIcons[newIndex]);
+    setActiveIconRef(iconRefs.current[availableIcons[newIndex]]);
+  };
+
   // Componente GlobalPopup para renderizar o popup fora dos containers dos ícones
   const GlobalPopup = () => {
     // Não renderizar nada se não houver popup ativo
     if (!activePopup || !activeIconRef) return null;
     
     // Definir todos os ícones disponíveis para o carrossel
-    const availableIcons = selectedMachine?.baseModel === "ILUMAi-ONE" 
-      ? ["FlexPuffONE", "InicioAutomatico"] 
-      : ["FlexPuff", "FlexBattery", "ModoPausa", "EcraTatil"];
+    const availableIcons = selectedMachine ? getAvailableIcons(selectedMachine.baseModel) : [];
     
-    // Encontrar índice do ícone ativo no array de ícones disponíveis
-    const activeIconIndex = availableIcons.findIndex(icon => icon === activePopup);
-    
-    // Obter índices dos popups adjacentes
-    const totalIcons = availableIcons.length;
-    const prevIconIndex = (activeIconIndex - 1 + totalIcons) % totalIcons;
-    const nextIconIndex = (activeIconIndex + 1) % totalIcons;
-    
-    // Função para navegar para o próximo ícone no carrossel
-    const navigateToNextIcon = (direction: "left" | "right") => {
-      const newIndex = direction === "left" ? prevIconIndex : nextIconIndex;
-      
-      setSwipeDirection(direction);
-      
-      // Transição mais rápida
-      setTimeout(() => {
-        setActivePopup(availableIcons[newIndex]);
-        setActiveIconRef(iconRefs.current[availableIcons[newIndex]]);
-        setSwipeDirection(null);
-      }, 200); // Reduzido de 300ms para 200ms
-    };
-    
-    // Determinar conteúdo do popup com base no ícone ativo
+    // Obter informações dos popups
     const getPopupContent = (iconName: string) => {
       let title = '';
       let content: React.ReactNode = null;
@@ -410,289 +451,90 @@ export default function Carousel() {
       return { title, content, iconSrc };
     };
     
-    // Obter informações dos popups
-    const activePopupInfo = getPopupContent(activePopup);
-    const prevPopupInfo = getPopupContent(availableIcons[prevIconIndex]);
-    const nextPopupInfo = getPopupContent(availableIcons[nextIconIndex]);
-    
-    // Obter todos os caminhos dos ícones para o carrossel
-    const getIconInfo = (iconName: string) => {
-      switch (iconName) {
-        case "FlexPuff":
-        case "FlexPuffONE":
-          return { src: "/IQOSILUMAV2/Icons/FlexPuff.svg", label: "Flex Puff" };
-        case "FlexBattery":
-          return { src: "/IQOSILUMAV2/Icons/FlexBattery.svg", label: "Flex Battery" };
-        case "ModoPausa":
-          return { src: "/IQOSILUMAV2/Icons/Modo Pausa.svg", label: "Modo Pausa" };
-        case "EcraTatil":
-          return { src: "/IQOSILUMAV2/Icons/EcraTatil.svg", label: "Ecrã Tátil" };
-        case "InicioAutomatico":
-          return { src: "/IQOSILUMAV2/Icons/InicioAutomatico.svg", label: "Início Automático" };
-        default:
-          return { src: "", label: "" };
-      }
-    };
-    
     return (
       <>
-        {/* Overlay que desfoca o resto da interface mas não o ícone ativo */}
         <motion.div 
           className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={() => {
-            setActivePopup(null);
-            setActiveIconRef(null);
-          }}
+          transition={{ duration: 0.3 }}
         />
-        
-        {/* Container do popup com paralaxe */}
+
         <motion.div
-          id="popup-container"
-          className="fixed inset-0 flex items-center justify-center z-[150] pointer-events-none overflow-visible"
+          className="fixed inset-0 flex items-center justify-center z-[150] pointer-events-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.3 }}
         >
-          {/* Popup principal (centro) */}
-          <div className="relative flex items-center justify-center w-full perspective-[1200px]">
-            <AnimatePresence mode="sync" initial={false}>
-              {/* Popup anterior (esquerda) */}
+          <div className="relative w-full max-w-4xl">
+            <AnimatePresence mode="wait" initial={false} custom={swipeDirection}>
               <motion.div
-                key={`popup-left-${availableIcons[prevIconIndex]}`}
-                className="absolute left-[18%] w-[65%] max-w-md bg-gradient-to-br from-[#2D8F9B]/60 to-[#045557]/60 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-md p-4 shadow-xl pointer-events-auto overflow-hidden origin-left scale-[0.55] opacity-50 z-[145] transform-gpu blur-[1px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToNextIcon("left");
-                }}
-                whileHover={{ scale: 0.6, opacity: 0.7, filter: "blur(0px)" }}
-                initial={{ x: "-60%", rotateY: 45, filter: "blur(2px)" }}
-                animate={{ x: "-30%", rotateY: 35, filter: "blur(1px)" }}
-                exit={{ x: "-60%", rotateY: 45, filter: "blur(2px)" }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-              >
-                <div className="relative">
-                  {/* Conteúdo do popup anterior */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/40">
-                      <Image
-                        src={prevPopupInfo.iconSrc}
-                        alt={prevPopupInfo.title}
-                        width={24}
-                        height={24}
-                        className="w-5 h-5 brightness-0 invert"
-                      />
-                    </div>
-                    <h3 className="text-lg font-iqos font-bold text-white/80">{prevPopupInfo.title}</h3>
-                  </div>
-                  <div className="h-32 overflow-hidden text-xs text-white/80 font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/20">
-                    {prevPopupInfo.content}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Popup principal (centro) */}
-              <motion.div
-                key={`popup-center-${activePopup}`}
-                layoutId={activePopup}
-                className="w-[85%] max-w-lg bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto overflow-hidden relative z-[149] transform-gpu"
-                initial={{ scale: 0.9 }}
-                animate={{ 
-                  scale: 1, 
-                  y: 0,
-                  rotateX: [-2, 2, -2],
-                  rotateY: [1, -1, 1]
-                }}
-                exit={{ scale: 0.9 }}
+                key={activePopup}
+                variants={popupVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                custom={swipeDirection}
                 transition={{ 
                   type: "spring", 
-                  damping: 25, 
-                  stiffness: 350,
-                  rotateX: {
-                    repeat: Infinity,
-                    duration: 5,
-                    ease: "easeInOut"
-                  },
-                  rotateY: {
-                    repeat: Infinity,
-                    duration: 7,
-                    ease: "easeInOut"
-                  }
+                  stiffness: 300, 
+                  damping: 30,
+                  mass: 0.8
                 }}
-                onClick={(e) => e.stopPropagation()}
+                className="w-[85%] max-w-lg mx-auto bg-gradient-to-br from-[#2D8F9B] to-[#045557] border-2 border-[#3CABB8]/60 rounded-xl backdrop-blur-xl p-6 shadow-2xl pointer-events-auto"
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.3}
-                onDragEnd={(e, { offset, velocity }) => {
-                  const swipe = offset.x;
-                  if (Math.abs(swipe) > 50) {
-                    if (swipe < 0) {
-                      navigateToNextIcon("right");
-                    } else {
-                      navigateToNextIcon("left");
-                    }
+                dragElastic={0.2}
+                onDragEnd={(e, { offset }) => {
+                  if (Math.abs(offset.x) > 100) {
+                    navigateToNextIcon(offset.x < 0 ? "right" : "left");
                   }
                 }}
               >
-                {/* Contorno futurista estático */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent" />
-                <div className="absolute top-0 right-0 h-full w-1 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
-                <div className="absolute top-0 left-0 h-full w-1 bg-gradient-to-b from-transparent via-white/70 to-transparent" />
-                
-                {/* Cantos brilhantes */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white/70 rounded-tl-lg" />
-                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-white/70 rounded-tr-lg" />
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-white/70 rounded-bl-lg" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-white/70 rounded-br-lg" />
-                
-                {/* Efeito de brilho nos cantos com movimento */}
-                <motion.div 
-                  className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#5CD9E8]/40 to-transparent rounded-full blur-2xl" 
-                  animate={{
-                    x: [0, 20, 0],
-                    y: [0, 10, 0]
-                  }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-                <motion.div 
-                  className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#5CD9E8]/40 to-transparent rounded-full blur-2xl"
-                  animate={{
-                    x: [0, -20, 0],
-                    y: [0, -10, 0]
-                  }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-                
                 {/* Conteúdo do popup */}
-                <motion.div 
-                  className="relative"
-                  initial={{ y: 0 }}
-                  animate={{ 
-                    y: 0,
-                    x: swipeDirection === "left" ? [0, 300] : swipeDirection === "right" ? [0, -300] : [0, -3, 0, 3, 0],
-                  }}
-                  transition={{ 
-                    duration: swipeDirection ? 0.4 : 0.4,
-                    x: swipeDirection ? { 
-                      duration: 0.4,
-                      ease: "easeInOut" 
-                    } : {
-                      duration: 15,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }
-                  }}
-                >
-                  {/* Cabeçalho com ícone e título */}
+                <div className="relative">
                   <div className="flex items-center gap-4 mb-5">
                     <div className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-2 ring-2 ring-[#5CD9E8]/60">
                       <Image
-                        src={activePopupInfo.iconSrc}
-                        alt={activePopupInfo.title}
+                        src={getPopupContent(activePopup).iconSrc}
+                        alt={getPopupContent(activePopup).title}
                         width={48}
                         height={48}
                         className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 brightness-0 invert"
                       />
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">{activePopupInfo.title}</h3>
+                    <h3 className="text-xl sm:text-2xl font-iqos font-bold text-white">
+                      {getPopupContent(activePopup).title}
+                    </h3>
                   </div>
-                  <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">{activePopupInfo.content}</div>
-                </motion.div>
-                
-                {/* Grafismo futurista */}
-                <div className="absolute top-6 right-6 w-16 h-16 border-t-2 border-r-2 border-[#5CD9E8]/30 rounded-tr-3xl" />
-                <div className="absolute bottom-6 left-6 w-16 h-16 border-b-2 border-l-2 border-[#5CD9E8]/30 rounded-bl-3xl" />
-                
-                {/* Setas para navegar entre popups */}
-                <div className="absolute top-1/2 -translate-y-1/2 left-0 p-2">
+                  <div className="text-sm sm:text-base text-white font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-4 rounded-lg border border-[#5CD9E8]/20">
+                    {getPopupContent(activePopup).content}
+                  </div>
+                </div>
+
+                {/* Botões de navegação */}
+                <div className="absolute left-4 top-1/2 -translate-y-1/2">
                   <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigateToNextIcon("left");
-                    }}
-                    className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white/70 hover:text-white/100 transition-colors transform hover:scale-110"
-                    aria-label="Popup anterior"
+                    onClick={() => navigateToNextIcon("left")}
+                    className="text-white/70 hover:text-white transition-colors"
                   >
-                    <ChevronLeftIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <ChevronLeftIcon className="w-8 h-8" />
                   </button>
                 </div>
-                
-                <div className="absolute top-1/2 -translate-y-1/2 right-0 p-2">
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
                   <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigateToNextIcon("right");
-                    }}
-                    className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white/70 hover:text-white/100 transition-colors transform hover:scale-110"
-                    aria-label="Próximo popup"
+                    onClick={() => navigateToNextIcon("right")}
+                    className="text-white/70 hover:text-white transition-colors"
                   >
-                    <ChevronRightIcon className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <ChevronRightIcon className="w-8 h-8" />
                   </button>
-                </div>
-              </motion.div>
-              
-              {/* Popup seguinte (direita) */}
-              <motion.div
-                key={`popup-right-${availableIcons[nextIconIndex]}`}
-                className="absolute right-[18%] w-[65%] max-w-md bg-gradient-to-br from-[#2D8F9B]/60 to-[#045557]/60 border-2 border-[#3CABB8]/40 rounded-xl backdrop-blur-md p-4 shadow-xl pointer-events-auto overflow-hidden origin-right scale-[0.55] opacity-50 z-[145] transform-gpu blur-[1px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToNextIcon("right");
-                }}
-                whileHover={{ scale: 0.6, opacity: 0.7, filter: "blur(0px)" }}
-                initial={{ x: "60%", rotateY: -45, filter: "blur(2px)" }}
-                animate={{ x: "30%", rotateY: -35, filter: "blur(1px)" }}
-                exit={{ x: "60%", rotateY: -45, filter: "blur(2px)" }}
-                transition={{ duration: 0.4, ease: "easeInOut" }}
-              >
-                <div className="relative">
-                  {/* Conteúdo do popup seguinte */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#1A6A72]/60 backdrop-blur-md p-1 ring-1 ring-[#5CD9E8]/40">
-                      <Image
-                        src={nextPopupInfo.iconSrc}
-                        alt={nextPopupInfo.title}
-                        width={24}
-                        height={24}
-                        className="w-5 h-5 brightness-0 invert"
-                      />
-                    </div>
-                    <h3 className="text-lg font-iqos font-bold text-white/80">{nextPopupInfo.title}</h3>
-                  </div>
-                  <div className="h-32 overflow-hidden text-xs text-white/80 font-iqos leading-relaxed bg-[#1A6A72]/20 backdrop-blur-sm p-3 rounded-lg border border-[#5CD9E8]/20">
-                    {nextPopupInfo.content}
-                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
-            
-            {/* Dica de swipe */}
-            <div className="absolute bottom-10 left-0 right-0 text-center">
-              <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-full">
-                <motion.div 
-                  className="text-xs sm:text-sm text-white/80"
-                  animate={{ x: [-10, 10, -10] }}
-                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                >
-                  ← Deslize para navegar →
-                </motion.div>
-              </div>
-            </div>
 
-            {/* Carrossel de ícones abaixo do popup principal */}
+            {/* Carrossel de ícones */}
             <div className="absolute left-0 right-0 bottom-[-3rem] sm:bottom-[-4rem] md:bottom-[-5rem] flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
               {availableIcons.map((iconName, index) => {
                 const isActive = iconName === activePopup;
@@ -700,8 +542,7 @@ export default function Carousel() {
                 return (
                   <motion.button
                     key={iconName}
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       setActivePopup(iconName);
                       setActiveIconRef(iconRefs.current[iconName]);
                     }}
