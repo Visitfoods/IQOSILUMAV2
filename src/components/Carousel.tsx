@@ -621,7 +621,7 @@ export default function Carousel() {
       );
     };
     
-    // Gerar cards para o carrossel (renderiza todos os popups)
+    // Renderizar cards para o carrossel (renderiza todos os popups)
     const renderCards = () => {
       return availableIcons.map((iconName, index) => {
         // Calcular a posição relativa (distância em índices do card ativo)
@@ -684,15 +684,12 @@ export default function Carousel() {
         />
 
         <div className="fixed inset-0 flex items-center justify-center z-[150]" onClick={(e) => e.stopPropagation()}>
-          <div className="relative w-full max-w-5xl">
+          <div id="popup-container" className="w-full max-w-5xl relative">
             <div className="relative w-full h-[70vh] sm:h-[60vh] md:h-[50vh] flex items-center justify-center">
-              {/* Carrossel contínuo de popups */}
-              <motion.div
-                className="relative flex justify-center items-center w-full h-full"
-                style={{ left: '50%', transform: 'translateX(-50%)' }}
-              >
+              {/* Carrossel centralizado com motion.div */}
+              <div className="relative flex justify-center items-center w-full h-full" style={{ left: '50%', transform: 'translateX(-50%)' }}>
                 {renderCards()}
-              </motion.div>
+              </div>
 
               {/* Botão para alternar efeitos de animação */}
               <button 
@@ -701,20 +698,7 @@ export default function Carousel() {
               >
                 Efeito: {animationVariant}
               </button>
-
-              {/* Áreas para cliques de navegação */}
-              <button 
-                className="absolute left-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
-                onClick={navigatePrev}
-                aria-label="Popup anterior"
-              />
               
-              <button 
-                className="absolute right-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
-                onClick={navigateNext}
-                aria-label="Próximo popup"
-              />
-
               {/* Setas de navegação */}
               <div className="absolute w-full flex justify-between px-4 sm:px-8 md:px-12 pointer-events-none">
                 <button
@@ -733,6 +717,19 @@ export default function Carousel() {
                 </button>
               </div>
             </div>
+
+            {/* Áreas para cliques de navegação */}
+            <button 
+              className="absolute left-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+              onClick={navigatePrev}
+              aria-label="Popup anterior"
+            />
+            
+            <button 
+              className="absolute right-0 top-0 bottom-0 w-1/4 h-full z-[15] bg-transparent focus:outline-none"
+              onClick={navigateNext}
+              aria-label="Próximo popup"
+            />
 
             {/* Carrossel de ícones (miniaturas) */}
             <div className="absolute left-0 right-0 bottom-[-3rem] sm:bottom-[-4rem] md:bottom-[-5rem] flex justify-center items-center gap-4 sm:gap-6 md:gap-8">
