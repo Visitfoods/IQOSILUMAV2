@@ -24,20 +24,20 @@
       name: "ILUMAi BREEZE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi/ILUMAi_BREEZE.png", 
       baseModel: "ILUMAi", 
-      modelPath: "/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
     },
     { 
       id: 2, 
       name: "ILUMAi ONE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", 
       baseModel: "ILUMAi-ONE",
-      modelPath: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
       modelPaths: {
-        Breeze: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
-        Midnight: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
-        Leaf: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
-        Terracotta: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
-        Violet: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
+        Breeze: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+        Midnight: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
+        Leaf: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
+        Terracotta: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
+        Violet: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
       }
     },
     { 
@@ -300,11 +300,24 @@
 
     // Função para obter o caminho do modelo 3D
     const getModelPath = (machine: Machine, colorVariant?: ColorVariant) => {
+      if (!machine) return null;
+
+      let modelPath = '';
       if (machine.baseModel === "ILUMAi-ONE") {
-        const modelPath = machine.modelPaths?.[colorVariant || selectedColor] || machine.modelPath;
-        return modelPath ? `${basePath}${modelPath}` : null;
+        modelPath = machine.modelPaths?.[colorVariant || selectedColor] || machine.modelPath || '';
+      } else {
+        modelPath = machine.modelPath || '';
       }
-      return machine.modelPath ? `${basePath}${machine.modelPath}` : null;
+
+      // Se não houver modelPath, retorna null
+      if (!modelPath) return null;
+
+      // Garantir que o caminho comece com /IQOSILUMAV2
+      if (!modelPath.startsWith('/IQOSILUMAV2')) {
+        modelPath = `/IQOSILUMAV2${modelPath}`;
+      }
+
+      return modelPath;
     };
 
     // Alternar entre imagem 2D e modelo 3D
