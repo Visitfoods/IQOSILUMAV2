@@ -794,21 +794,35 @@
 
     // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
     const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
-      // Sempre usar imagem 2D para ILUMAi ONE devido a problemas de carregamento dos modelos 3D
-      const shouldShow3D = machine.baseModel !== "ILUMAi-ONE" && showModel3D && !modelLoadError;
+      // Mostrar modelo 3D para ILUMAi ONE se não houver erro de carregamento
+      const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
       
       return (
         <div className="relative flex items-center justify-center">
           {machine.baseModel === "ILUMAi-ONE" ? (
-            // Sempre usar imagem 2D para ILUMAi ONE
-            <Image
-              src={getImagePath(machine, colorVariant)}
-              alt={machine.name}
-              width={400}
-              height={400}
-              className="w-32 sm:w-45 md:w-50 h-auto object-contain"
-              priority
-            />
+            <>
+              {/* ILUMAi ONE: Tenta carregar modelo 3D, fallback para imagem */}
+              {shouldShow3D ? (
+                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
+                  <ModelViewer3D 
+                    modelPath={getModelPath(machine, colorVariant) || ""}
+                    scale={7}
+                    position={[0, 0, 0]}
+                    autoRotate={true}
+                    onError={handleModelLoadError}
+                  />
+                </div>
+              ) : (
+                <Image
+                  src={getImagePath(machine, colorVariant)}
+                  alt={machine.name}
+                  width={400}
+                  height={400}
+                  className="w-32 sm:w-45 md:w-50 h-auto object-contain"
+                  priority
+                />
+              )}
+            </>
           ) : (
             <>
               {/* Botão "Ver em 3D" para outros modelos */}
