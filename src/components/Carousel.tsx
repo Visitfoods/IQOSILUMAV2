@@ -592,8 +592,9 @@
           
           return (
             <motion.div
-              key={`popup-card-${iconName}`}
+              key={`popup-card-${iconName}-${activeIndex}`}
               className="absolute"
+              layout
               style={{
                 x: xPosition,
                 scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
@@ -602,7 +603,6 @@
                 zIndex: isCurrent ? 100 : 100 - Math.abs(positionOffset) * 10,
                 pointerEvents: isCurrent ? 'auto' : 'none',
               }}
-              initial={{ x: xPosition }}
               animate={{
                 x: xPosition,
                 scale: isCurrent ? 1 : Math.max(0.7, 1 - (distance / cardWidth * 0.2)),
@@ -613,7 +613,7 @@
               transition={{
                 type: "spring",
                 stiffness: 400,
-                damping: 40,
+                damping: 30,
                 bounce: 0.1,
               }}
               drag={isCurrent ? "x" : false}
