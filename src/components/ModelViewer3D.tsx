@@ -19,7 +19,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   
-  console.log('ModelViewer3D está a tentar carregar:', modelPath);
+  console.log('ModelViewer3D está a tentar carregar:', modelPath, 'com escala:', scale);
   
   // Hooks devem estar no topo do componente, não dentro de condicionais
   const gltf = useGLTF(modelPath || '/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb');
@@ -35,7 +35,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
     
     try {
       if (gltf && gltf.scene) {
-        console.log('Modelo 3D carregado com sucesso:', modelPath);
+        console.log('Modelo 3D carregado com sucesso:', modelPath, 'usando escala:', scale);
         setIsLoaded(true);
         if (onLoad && !isLoaded) {
           console.log('Chamando onLoad callback');
@@ -49,17 +49,8 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
         if (onError) onError();
       }
     }
-  }, [gltf, modelPath, onLoad, isLoaded, hasError, onError]);
+  }, [gltf, modelPath, onLoad, isLoaded, hasError, onError, scale]);
 
-  // Renderização condicionada por verificações de erro
-  if (!modelPath || modelPath === "") {
-    if (!hasError) {
-      setHasError(true);
-      if (onError) onError();
-    }
-    return null;
-  }
-  
   // Tratar erros após os Hooks
   try {
     if (!gltf || !gltf.scene) {
@@ -74,6 +65,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
       return null;
     }
     
+    console.log('Renderizando modelo com escala:', scale);
     return (
       <Stage
         preset="soft"
@@ -84,7 +76,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
       >
         <primitive 
           object={gltf.scene} 
-          scale={scale} 
+          scale={scale}
           position={position} 
         />
       </Stage>
