@@ -80,7 +80,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
         intensity={2.5}
         environment="city"
         shadows={false}
-        adjustCamera={true}
+        adjustCamera={false}
       >
         <primitive 
           object={gltf.scene} 
@@ -195,7 +195,7 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
   return (
     <Canvas
       style={{ width: '100%', height: '100%' }}
-      camera={{ position: [0, 0, 15], fov: 20 }}
+      camera={{ position: [0, 0, 25], fov: 30 }}
       shadows={true}
       gl={{ 
         antialias: true,
@@ -208,9 +208,9 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
         gl.toneMappingExposure = 1.5;
         
         // Ajustar a câmera para mostrar um objeto maior
-        camera.position.set(0, 0, 15);
+        camera.position.set(0, 0, 25);
         if (camera instanceof THREE.PerspectiveCamera) {
-          camera.fov = 20;
+          camera.fov = 30;
           camera.updateProjectionMatrix();
         }
         
