@@ -872,7 +872,7 @@
               <div className={`w-[350px] h-[500px] sm:w-[400px] sm:h-[550px] md:w-[450px] md:h-[600px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
                 <ModelViewer3D 
                   modelPath={getModelPath(machine, colorVariant) || ""}
-                  scale={45}
+                  scale={30}
                   position={[0, 0, 0]}
                   autoRotate={true}
                   onError={handleModelLoadError}
