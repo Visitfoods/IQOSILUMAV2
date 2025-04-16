@@ -24,27 +24,28 @@
       name: "ILUMAi BREEZE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi/ILUMAi_BREEZE.png", 
       baseModel: "ILUMAi", 
-      modelPath: "/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi/ILUMAi_BREEZE.glb" 
     },
     { 
       id: 2, 
       name: "ILUMAi ONE", 
       image: "/IQOSILUMAV2/IMG/ILUMAi-ONE/ILUMAi-ONE_BREEZE.png", 
       baseModel: "ILUMAi-ONE",
-      modelPath: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
       modelPaths: {
-        Breeze: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
-        Midnight: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
-        Leaf: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
-        Terracotta: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
-        Violet: "/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
+        Breeze: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb",
+        Midnight: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-MIDNIGHT.glb",
+        Leaf: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-LEAF.glb",
+        Terracotta: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-TERRACOTA.glb",
+        Violet: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-VIOLET.glb"
       }
     },
     { 
       id: 3, 
       name: "ILUMAi PRIME", 
       image: "/IQOSILUMAV2/IMG/ILUMAi-PRIME/ILUMAi-PRIME_BREEZE.png", 
-      baseModel: "ILUMAi-PRIME" 
+      baseModel: "ILUMAi-PRIME",
+      modelPath: "/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb" 
     },
   ];
 
@@ -333,8 +334,14 @@
         return null;
       }
 
+      // Certificar-se de que o caminho começa com o prefixo correto
+      if (!modelPath.startsWith('/IQOSILUMAV2') && modelPath.startsWith('/')) {
+        modelPath = `/IQOSILUMAV2${modelPath}`;
+      }
+
       // Verificar se o caminho é válido
       console.log("Caminho final do modelo 3D:", modelPath);
+      
       return modelPath;
     };
 
@@ -816,19 +823,25 @@
     // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
     const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
       const [isLoading, setIsLoading] = useState(true);
-      // Mostrar modelo 3D sempre, independente do modelo, só mostrar imagem se houver erro
-      const shouldShow3D = !modelLoadError && machine.modelPath !== undefined;
+      const [localModelError, setLocalModelError] = useState(false);
       
-      // Resetar isLoading sempre que mudar de cor ou máquina
+      // Mostrar modelo 3D sempre, independente do modelo, só mostrar imagem se houver erro
+      const shouldShow3D = !modelLoadError && !localModelError && machine.modelPath !== undefined;
+      
+      // Resetar isLoading e localModelError sempre que mudar de cor ou máquina
       useEffect(() => {
         setIsLoading(true);
+        setLocalModelError(false);
       }, [machine, colorVariant]);
 
       const handleModelLoadSuccess = () => {
+        console.log("Modelo carregado com sucesso:", getModelPath(machine, colorVariant));
         setIsLoading(false);
       };
       
       const handleModelLoadError = () => {
+        console.error("Erro ao carregar modelo para:", machine.baseModel, colorVariant);
+        setLocalModelError(true);
         setModelLoadError(true);
       };
 

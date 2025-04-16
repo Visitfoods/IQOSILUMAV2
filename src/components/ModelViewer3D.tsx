@@ -22,63 +22,81 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
   console.log('ModelViewer3D está a tentar carregar:', modelPath);
   
   // Hooks devem estar no topo do componente, não dentro de condicionais
-  const gltf = useGLTF(modelPath);
+  const gltf = useGLTF(modelPath || '/IQOSILUMAV2/3DMODELS/ILUMAi-ONE/ILUMAi-ONE-BREEZE.glb');
   
   // useEffect para detetar quando o modelo está carregado
   useEffect(() => {
-    if (gltf && gltf.scene) {
-      console.log('Modelo 3D carregado com sucesso:', modelPath);
-      setIsLoaded(true);
-      if (onLoad && !isLoaded) {
-        console.log('Chamando onLoad callback');
-        onLoad();
+    // Verificar se o modelPath é válido
+    if (!modelPath || modelPath === "") {
+      console.error('ModelPath é inválido ou vazio');
+      if (onError) onError();
+      return;
+    }
+    
+    try {
+      if (gltf && gltf.scene) {
+        console.log('Modelo 3D carregado com sucesso:', modelPath);
+        setIsLoaded(true);
+        if (onLoad && !isLoaded) {
+          console.log('Chamando onLoad callback');
+          onLoad();
+        }
+      }
+    } catch (error) {
+      console.error('Erro no useEffect do ModelViewer3D:', error);
+      if (!hasError) {
+        setHasError(true);
+        if (onError) onError();
       }
     }
-  }, [gltf, modelPath, onLoad, isLoaded]);
+  }, [gltf, modelPath, onLoad, isLoaded, hasError, onError]);
 
+  // Renderização condicionada por verificações de erro
+  if (!modelPath || modelPath === "") {
+    if (!hasError) {
+      setHasError(true);
+      if (onError) onError();
+    }
+    return null;
+  }
+  
   // Tratar erros após os Hooks
-  let scene;
   try {
-    scene = gltf.scene;
+    if (!gltf || !gltf.scene) {
+      console.error('Scene é null ou undefined para o modelo:', modelPath);
+      if (!hasError) {
+        setHasError(true);
+        if (onError) {
+          console.log('Chamando onError porque scene é null');
+          onError();
+        }
+      }
+      return null;
+    }
+    
+    return (
+      <Stage
+        preset="soft"
+        intensity={2.5}
+        environment="city"
+        shadows={false}
+        adjustCamera={false}
+      >
+        <primitive 
+          object={gltf.scene} 
+          scale={scale} 
+          position={position} 
+        />
+      </Stage>
+    );
   } catch (error) {
-    console.error('Erro ao acessar gltf.scene:', error);
+    console.error('Erro ao renderizar modelo 3D:', error);
     if (!hasError) {
       setHasError(true);
-      if (onError) {
-        console.log('Chamando onError devido a falha no acesso à scene');
-        onError();
-      }
+      if (onError) onError();
     }
     return null;
   }
-  
-  if (!scene) {
-    console.error('Scene é null ou undefined para o modelo:', modelPath);
-    if (!hasError) {
-      setHasError(true);
-      if (onError) {
-        console.log('Chamando onError porque scene é null');
-        onError();
-      }
-    }
-    return null;
-  }
-  
-  return (
-    <Stage
-      preset="soft"
-      intensity={2.5}
-      environment="city"
-      shadows={false}
-      adjustCamera={false}
-    >
-      <primitive 
-        object={scene} 
-        scale={scale} 
-        position={position} 
-      />
-    </Stage>
-  );
 }
 
 // Componente de fallback para capturar erros no carregamento de modelos
@@ -111,6 +129,7 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
 export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError, onLoad }: ModelViewerProps) {
   const controlsRef = useRef(null);
   const [isComponentMounted, setIsComponentMounted] = useState(false);
+  const [hasError, setHasError] = useState(false);
   
   console.log('ModelViewer3D inicializado com modelPath:', modelPath);
 
@@ -118,11 +137,19 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
   useEffect(() => {
     setIsComponentMounted(true);
     
+    // Verificar se o modelPath é válido
+    if (!modelPath || modelPath === "") {
+      console.error('ModelPath fornecido ao componente é inválido ou vazio');
+      setHasError(true);
+      if (onError) onError();
+      return;
+    }
+    
     // Chamar onLoad após 2 segundos como último recurso
     let timer: NodeJS.Timeout;
     if (onLoad) {
       timer = setTimeout(() => {
-        console.log('ModelViewer3D: Chamando onLoad por timeout de fallback');
+        console.log('ModelViewer3D: Chamando onLoad por timeout de fallback para:', modelPath);
         onLoad();
       }, 2000);
     }
@@ -130,28 +157,40 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [onLoad]);
+  }, [onLoad, modelPath, onError]);
 
   // Precarregar o modelo
   useEffect(() => {
+    if (!modelPath || modelPath === "") {
+      return;
+    }
+    
     try {
       console.log('Tentando precarregar o modelo:', modelPath);
       useGLTF.preload(modelPath);
       console.log('Modelo precarregado com sucesso');
     } catch (error) {
       console.error("Erro ao precarregar modelo:", error);
+      setHasError(true);
+      if (onError) onError();
     }
     
     // Limpeza ao desmontar
     return () => {
       // Nenhuma ação necessária para limpeza
     };
-  }, [modelPath]);
+  }, [modelPath, onError]);
 
   const handleModelError = () => {
     console.error("Erro capturado pelo ModelViewer3D:", modelPath);
+    setHasError(true);
     if (onError) onError();
   };
+
+  // Se houver erro, não renderizar o canvas
+  if (hasError) {
+    return null;
+  }
 
   return (
     <Canvas
