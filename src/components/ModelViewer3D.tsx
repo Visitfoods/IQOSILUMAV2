@@ -244,7 +244,7 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
         ref={controlsRef} 
         autoRotate={autoRotate} 
         autoRotateSpeed={1.5} 
-        enableZoom={true}
+        enableZoom={false}
         enablePan={false}
         minDistance={5}
         maxDistance={20}
