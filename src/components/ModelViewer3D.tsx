@@ -36,6 +36,10 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
     try {
       if (gltf && gltf.scene) {
         console.log('Modelo 3D carregado com sucesso:', modelPath, 'usando escala:', scale);
+        
+        // Garantir que a escala seja aplicada corretamente
+        gltf.scene.scale.set(scale, scale, scale);
+        
         setIsLoaded(true);
         if (onLoad && !isLoaded) {
           console.log('Chamando onLoad callback');
@@ -66,13 +70,17 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
     }
     
     console.log('Renderizando modelo com escala:', scale);
+    
+    // Aplicar escala diretamente na cena também
+    gltf.scene.scale.set(scale, scale, scale);
+    
     return (
       <Stage
         preset="soft"
         intensity={2.5}
         environment="city"
         shadows={false}
-        adjustCamera={false}
+        adjustCamera={true}
       >
         <primitive 
           object={gltf.scene} 
@@ -123,7 +131,7 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
   const [isComponentMounted, setIsComponentMounted] = useState(false);
   const [hasError, setHasError] = useState(false);
   
-  console.log('ModelViewer3D inicializado com modelPath:', modelPath);
+  console.log('ModelViewer3D inicializado com modelPath:', modelPath, 'e escala:', scale);
 
   // Garantir que onLoad seja chamado ao menos uma vez quando o componente montar
   useEffect(() => {
@@ -187,7 +195,7 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
   return (
     <Canvas
       style={{ width: '100%', height: '100%' }}
-      camera={{ position: [0, 5, 15], fov: 45 }}
+      camera={{ position: [0, 0, 15], fov: 20 }}
       shadows={true}
       gl={{ 
         antialias: true,
@@ -195,10 +203,18 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
         toneMapping: ACESFilmicToneMapping,
         toneMappingExposure: 1.5
       }}
-      onCreated={({ gl }) => {
+      onCreated={({ gl, camera }) => {
         gl.toneMapping = ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.5;
-        console.log('Canvas criado com sucesso');
+        
+        // Ajustar a câmera para mostrar um objeto maior
+        camera.position.set(0, 0, 15);
+        if (camera instanceof THREE.PerspectiveCamera) {
+          camera.fov = 20;
+          camera.updateProjectionMatrix();
+        }
+        
+        console.log('Canvas criado com sucesso, câmera ajustada, escala do modelo:', scale);
         // Chamar onLoad aqui também como recurso adicional
         if (onLoad && isComponentMounted) {
           console.log('Chamando onLoad após criação do Canvas');

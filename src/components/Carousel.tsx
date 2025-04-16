@@ -869,10 +869,10 @@
           {shouldShow3D ? (
             <>
               {isLoading && <LoadingSpinner />}
-              <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+              <div className={`w-[350px] h-[500px] sm:w-[400px] sm:h-[550px] md:w-[450px] md:h-[600px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
                 <ModelViewer3D 
                   modelPath={getModelPath(machine, colorVariant) || ""}
-                  scale={7}
+                  scale={45}
                   position={[0, 0, 0]}
                   autoRotate={true}
                   onError={handleModelLoadError}
