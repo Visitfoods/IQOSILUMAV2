@@ -869,11 +869,11 @@
           {shouldShow3D ? (
             <>
               {isLoading && <LoadingSpinner />}
-              <div className={`w-[400px] h-[600px] sm:w-[450px] sm:h-[650px] md:w-[500px] md:h-[700px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+              <div className={`w-[400px] h-[550px] sm:w-[450px] sm:h-[600px] md:w-[500px] md:h-[650px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
                 <ModelViewer3D 
                   modelPath={getModelPath(machine, colorVariant) || ""}
                   scale={30}
-                  position={[0, -5, 0]}
+                  position={[0, -10, 0]}
                   autoRotate={true}
                   onError={handleModelLoadError}
                   onLoad={handleModelLoadSuccess}
@@ -1223,7 +1223,7 @@
                     </div>
 
                     {/* Cores com efeito de arco em U */}
-                    <div className="relative mt-8 sm:mt-12 md:mt-16">
+                    <div className="relative mt-4 sm:mt-6 md:mt-8">
                       <div className="relative flex justify-center items-center">
                         {colorConfig
                           .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
