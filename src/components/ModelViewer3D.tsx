@@ -67,7 +67,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
   return (
     <Stage
       preset="soft"
-      intensity={1.8}
+      intensity={2.5}
       environment="city"
       shadows={false}
       adjustCamera={false}

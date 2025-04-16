@@ -816,8 +816,8 @@
     // Componente de visualização do dispositivo que alterna entre imagem e modelo 3D com fallback
     const DeviceViewer = ({ machine, colorVariant }: { machine: Machine, colorVariant: ColorVariant }) => {
       const [isLoading, setIsLoading] = useState(true);
-      // Mostrar modelo 3D SEMPRE por predefinição para ILUMAi ONE, só mostrar imagem se houver erro
-      const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
+      // Mostrar modelo 3D sempre, independente do modelo, só mostrar imagem se houver erro
+      const shouldShow3D = !modelLoadError && machine.modelPath !== undefined;
       
       // Resetar isLoading sempre que mudar de cor ou máquina
       useEffect(() => {
@@ -853,73 +853,29 @@
 
       return (
         <div className="relative flex items-center justify-center">
-          {machine.baseModel === "ILUMAi-ONE" ? (
+          {shouldShow3D ? (
             <>
-              {/* ILUMAi ONE: Mostrar loading e depois o modelo 3D, ou fallback para imagem se houver erro */}
-              {!modelLoadError ? (
-                <>
-                  {isLoading && <LoadingSpinner />}
-                  <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
-                    <ModelViewer3D 
-                      modelPath={getModelPath(machine, colorVariant) || ""}
-                      scale={7}
-                      position={[0, 0, 0]}
-                      autoRotate={true}
-                      onError={handleModelLoadError}
-                      onLoad={handleModelLoadSuccess}
-                    />
-                  </div>
-                </>
-              ) : (
-                <Image
-                  src={getImagePath(machine, colorVariant)}
-                  alt={machine.name}
-                  width={400}
-                  height={400}
-                  className="w-32 sm:w-45 md:w-50 h-auto object-contain"
-                  priority
+              {isLoading && <LoadingSpinner />}
+              <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+                <ModelViewer3D 
+                  modelPath={getModelPath(machine, colorVariant) || ""}
+                  scale={7}
+                  position={[0, 0, 0]}
+                  autoRotate={true}
+                  onError={handleModelLoadError}
+                  onLoad={handleModelLoadSuccess}
                 />
-              )}
+              </div>
             </>
           ) : (
-            <>
-              {/* Botão "Ver em 3D" para outros modelos */}
-              {machine.modelPath && (
-                <button
-                  onClick={toggleModelView}
-                  className="absolute right-4 top-0 text-white bg-black/40 hover:bg-black/60 backdrop-blur-sm px-4 py-2 rounded-full transition-colors z-20 flex items-center gap-2"
-                  aria-label={showModel3D ? "Ver Imagem" : "Ver em 3D"}
-                >
-                  <CubeIcon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
-                </button>
-              )}
-              
-              {shouldShow3D ? (
-                <>
-                  {isLoading && <LoadingSpinner />}
-                  <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
-                    <ModelViewer3D 
-                      modelPath={getModelPath(machine) || ""}
-                      scale={7}
-                      position={[0, 0, 0]}
-                      autoRotate={true}
-                      onError={handleModelLoadError}
-                      onLoad={handleModelLoadSuccess}
-                    />
-                  </div>
-                </>
-              ) : (
-                <Image
-                  src={getImagePath(machine, colorVariant)}
-                  alt={machine.name}
-                  width={400}
-                  height={400}
-                  className="w-32 sm:w-45 md:w-50 h-auto object-contain"
-                  priority
-                />
-              )}
-            </>
+            <Image
+              src={getImagePath(machine, colorVariant)}
+              alt={machine.name}
+              width={400}
+              height={400}
+              className="w-32 sm:w-45 md:w-50 h-auto object-contain"
+              priority
+            />
           )}
         </div>
       );
