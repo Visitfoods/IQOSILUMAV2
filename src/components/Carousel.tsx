@@ -816,6 +816,14 @@
       useEffect(() => {
         console.log('DeviceViewer: Resetando isLoading para true');
         setIsLoading(true);
+        
+        // Forçar isLoading para false após 5 segundos como fallback
+        const timer = setTimeout(() => {
+          console.log('DeviceViewer: Timeout - forçando isLoading para false');
+          setIsLoading(false);
+        }, 5000);
+        
+        return () => clearTimeout(timer);
       }, [machine, colorVariant]);
 
       const handleModelLoadSuccess = () => {
@@ -828,16 +836,24 @@
         setModelLoadError(true);
       };
 
+      // Componente de loading com spinner para melhor feedback visual
+      const LoadingSpinner = () => (
+        <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
+          <p className="text-white">Carregando modelo 3D...</p>
+        </div>
+      );
+
       return (
         <div className="relative flex items-center justify-center">
           {machine.baseModel === "ILUMAi-ONE" ? (
             <>
               {isLoading && !modelLoadError ? (
-                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] flex items-center justify-center">
-                  <p className="text-white">Carregando modelo 3D...</p>
-                </div>
+                <LoadingSpinner />
               ) : !modelLoadError ? (
-                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
+                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] relative">
+                  {/* Div de debug para confirmar se o ModelViewer3D está sendo renderizado */}
+                  <div className="absolute top-0 left-0 z-50 bg-black/50 text-white text-xs p-1">Renderizando modelo 3D</div>
                   <ModelViewer3D 
                     modelPath={getModelPath(machine, colorVariant) || ""}
                     scale={7}

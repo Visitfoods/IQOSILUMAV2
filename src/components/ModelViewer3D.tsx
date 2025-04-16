@@ -110,8 +110,27 @@ class ErrorBoundary extends React.Component<{onError?: () => void, children: Rea
 
 export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 0], autoRotate = false, onError, onLoad }: ModelViewerProps) {
   const controlsRef = useRef(null);
+  const [isComponentMounted, setIsComponentMounted] = useState(false);
   
   console.log('ModelViewer3D inicializado com modelPath:', modelPath);
+
+  // Garantir que onLoad seja chamado ao menos uma vez quando o componente montar
+  useEffect(() => {
+    setIsComponentMounted(true);
+    
+    // Chamar onLoad após 2 segundos como último recurso
+    let timer: NodeJS.Timeout;
+    if (onLoad) {
+      timer = setTimeout(() => {
+        console.log('ModelViewer3D: Chamando onLoad por timeout de fallback');
+        onLoad();
+      }, 2000);
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [onLoad]);
 
   // Precarregar o modelo
   useEffect(() => {
@@ -148,6 +167,12 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
       onCreated={({ gl }) => {
         gl.toneMapping = ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.5;
+        console.log('Canvas criado com sucesso');
+        // Chamar onLoad aqui também como recurso adicional
+        if (onLoad && isComponentMounted) {
+          console.log('Chamando onLoad após criação do Canvas');
+          onLoad();
+        }
       }}
     >
       {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
