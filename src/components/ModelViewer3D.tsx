@@ -67,7 +67,7 @@ function Model({ modelPath, scale = 3, position = [0, 0, 0], onError, onLoad }: 
   return (
     <Stage
       preset="soft"
-      intensity={1.8}
+      intensity={2.5}
       environment="city"
       shadows={false}
       adjustCamera={false}
@@ -162,11 +162,11 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
         antialias: true,
         alpha: true,
         toneMapping: ACESFilmicToneMapping,
-        toneMappingExposure: 1.5
+        toneMappingExposure: 2.0
       }}
       onCreated={({ gl }) => {
         gl.toneMapping = ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.5;
+        gl.toneMappingExposure = 2.0;
         console.log('Canvas criado com sucesso');
         // Chamar onLoad aqui também como recurso adicional
         if (onLoad && isComponentMounted) {
@@ -176,16 +176,26 @@ export default function ModelViewer3D({ modelPath, scale = 3, position = [0, 0, 
       }}
     >
       {/* Iluminação mais uniforme e brilhante, similar ao Google Model Viewer */}
-      <ambientLight intensity={3.5} />
-      <hemisphereLight intensity={2.5} color="#ffffff" groundColor="#e0e0ff" />
+      <ambientLight intensity={5.0} />
+      <hemisphereLight intensity={4.0} color="#ffffff" groundColor="#e0e0ff" />
       <directionalLight 
-        position={[5, 10, 5]} 
+        position={[10, 15, 10]} 
+        intensity={1.5} 
+        castShadow={false} 
+      />
+      <directionalLight 
+        position={[-10, 10, -10]} 
         intensity={1.0} 
         castShadow={false} 
       />
       <directionalLight 
-        position={[-5, 5, -5]} 
-        intensity={0.7} 
+        position={[0, 10, 0]} 
+        intensity={1.2} 
+        castShadow={false} 
+      />
+      <directionalLight 
+        position={[0, -5, 10]} 
+        intensity={0.8} 
         castShadow={false} 
       />
       
