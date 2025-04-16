@@ -74,9 +74,9 @@
     const pathname = usePathname();
     const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
-    // Estilos globais para a animação do efeito "snake"
+    // Estilos globais para a animação do efeito "snake" e loading
     useEffect(() => {
-      // Adicionar estilos de animação para o efeito "snake"
+      // Adicionar estilos de animação
       const style = document.createElement('style');
       style.innerHTML = `
         @keyframes snake {
@@ -85,6 +85,20 @@
           }
           100% {
             stroke-dashoffset: 1000;
+          }
+        }
+        @keyframes loading {
+          0% {
+            width: 0%;
+            left: 0;
+          }
+          50% {
+            width: 100%;
+            left: 0;
+          }
+          100% {
+            width: 0%;
+            left: 100%;
           }
         }
       `;
@@ -804,43 +818,36 @@
       const [isLoading, setIsLoading] = useState(true);
       // Mostrar modelo 3D SEMPRE por predefinição para ILUMAi ONE, só mostrar imagem se houver erro
       const shouldShow3D = machine.baseModel === "ILUMAi-ONE" ? !modelLoadError : (showModel3D && !modelLoadError);
-
-      // Debug logs
-      console.log('DeviceViewer para:', machine.baseModel);
-      console.log('- modelLoadError:', modelLoadError);
-      console.log('- isLoading:', isLoading);
-      console.log('- shouldShow3D:', shouldShow3D);
-      console.log('- Caminho do modelo:', getModelPath(machine, colorVariant));
       
       // Resetar isLoading sempre que mudar de cor ou máquina
       useEffect(() => {
-        console.log('DeviceViewer: Resetando isLoading para true');
         setIsLoading(true);
-        
-        // Forçar isLoading para false após 5 segundos como fallback
-        const timer = setTimeout(() => {
-          console.log('DeviceViewer: Timeout - forçando isLoading para false');
-          setIsLoading(false);
-        }, 5000);
-        
-        return () => clearTimeout(timer);
       }, [machine, colorVariant]);
 
       const handleModelLoadSuccess = () => {
-        console.log('DeviceViewer: Modelo carregado com sucesso!');
         setIsLoading(false);
       };
       
       const handleModelLoadError = () => {
-        console.error('DeviceViewer: Erro ao carregar o modelo 3D');
         setModelLoadError(true);
       };
 
-      // Componente de loading com spinner para melhor feedback visual
+      // Componente de loading com animação atrativa
       const LoadingSpinner = () => (
         <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
-          <p className="text-white">Carregando modelo 3D...</p>
+          <div className="relative">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-2 border-b-2 border-teal-400 mb-4"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-teal-400/30 animate-pulse"></div>
+            </div>
+          </div>
+          <div className="mt-6 text-center">
+            <p className="text-white font-medium text-lg mb-1">A carregar modelo 3D</p>
+            <p className="text-white/70 text-sm">Por favor aguarde...</p>
+          </div>
+          <div className="mt-3 w-40 h-1 bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-teal-400 to-blue-500 animate-[loading_1.5s_ease-in-out_infinite]"></div>
+          </div>
         </div>
       );
 
@@ -848,21 +855,21 @@
         <div className="relative flex items-center justify-center">
           {machine.baseModel === "ILUMAi-ONE" ? (
             <>
-              {isLoading && !modelLoadError ? (
-                <LoadingSpinner />
-              ) : !modelLoadError ? (
-                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] relative">
-                  {/* Div de debug para confirmar se o ModelViewer3D está sendo renderizado */}
-                  <div className="absolute top-0 left-0 z-50 bg-black/50 text-white text-xs p-1">Renderizando modelo 3D</div>
-                  <ModelViewer3D 
-                    modelPath={getModelPath(machine, colorVariant) || ""}
-                    scale={7}
-                    position={[0, 0, 0]}
-                    autoRotate={true}
-                    onError={handleModelLoadError}
-                    onLoad={handleModelLoadSuccess}
-                  />
-                </div>
+              {/* ILUMAi ONE: Mostrar loading e depois o modelo 3D, ou fallback para imagem se houver erro */}
+              {!modelLoadError ? (
+                <>
+                  {isLoading && <LoadingSpinner />}
+                  <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+                    <ModelViewer3D 
+                      modelPath={getModelPath(machine, colorVariant) || ""}
+                      scale={7}
+                      position={[0, 0, 0]}
+                      autoRotate={true}
+                      onError={handleModelLoadError}
+                      onLoad={handleModelLoadSuccess}
+                    />
+                  </div>
+                </>
               ) : (
                 <Image
                   src={getImagePath(machine, colorVariant)}
@@ -887,16 +894,21 @@
                   <span className="text-sm font-medium">{showModel3D ? "Ver Imagem" : "Ver em 3D"}</span>
                 </button>
               )}
+              
               {shouldShow3D ? (
-                <div className="w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px]">
-                  <ModelViewer3D 
-                    modelPath={getModelPath(machine) || ""}
-                    scale={7}
-                    position={[0, 0, 0]}
-                    autoRotate={true}
-                    onError={handleModelLoadError}
-                  />
-                </div>
+                <>
+                  {isLoading && <LoadingSpinner />}
+                  <div className={`w-[300px] h-[450px] sm:w-[350px] sm:h-[500px] md:w-[400px] md:h-[550px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+                    <ModelViewer3D 
+                      modelPath={getModelPath(machine) || ""}
+                      scale={7}
+                      position={[0, 0, 0]}
+                      autoRotate={true}
+                      onError={handleModelLoadError}
+                      onLoad={handleModelLoadSuccess}
+                    />
+                  </div>
+                </>
               ) : (
                 <Image
                   src={getImagePath(machine, colorVariant)}
