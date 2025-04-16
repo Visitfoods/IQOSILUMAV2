@@ -869,11 +869,11 @@
           {shouldShow3D ? (
             <>
               {isLoading && <LoadingSpinner />}
-              <div className={`w-[400px] h-[550px] sm:w-[450px] sm:h-[600px] md:w-[500px] md:h-[650px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
+              <div className={`w-[400px] h-[500px] sm:w-[450px] sm:h-[550px] md:w-[500px] md:h-[600px] ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}>
                 <ModelViewer3D 
                   modelPath={getModelPath(machine, colorVariant) || ""}
                   scale={30}
-                  position={[0, -10, 0]}
+                  position={[0, -20, 0]}
                   autoRotate={true}
                   onError={handleModelLoadError}
                   onLoad={handleModelLoadSuccess}
@@ -1088,7 +1088,7 @@
                   </div>
 
                   {/* Conteúdo principal centralizado */}
-                  <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="flex-1 flex flex-col items-center justify-start pt-10 sm:pt-12 md:pt-16">
                     {/* Container relativo para o dispositivo e ícones */}
                     <div className="relative flex items-center justify-center w-full px-20 sm:px-32 md:px-40">
                       {selectedMachine?.baseModel === "ILUMAi-ONE" ? (
@@ -1223,7 +1223,7 @@
                     </div>
 
                     {/* Cores com efeito de arco em U */}
-                    <div className="relative mt-4 sm:mt-6 md:mt-8">
+                    <div className="relative mt-0 sm:mt-2 md:mt-4">
                       <div className="relative flex justify-center items-center">
                         {colorConfig
                           .filter((c) => !c.availableFor || c.availableFor.includes(selectedMachine?.baseModel || ""))
